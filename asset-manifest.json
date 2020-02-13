@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.js": "/MaSchedule/static/js/main.2ba83473.chunk.js",
-    "main.js.map": "/MaSchedule/static/js/main.2ba83473.chunk.js.map",
+    "main.js": "/MaSchedule/static/js/main.d17f997a.chunk.js",
+    "main.js.map": "/MaSchedule/static/js/main.d17f997a.chunk.js.map",
     "runtime-main.js": "/MaSchedule/static/js/runtime-main.72bd37ec.js",
     "runtime-main.js.map": "/MaSchedule/static/js/runtime-main.72bd37ec.js.map",
     "static/js/2.18bebd08.chunk.js": "/MaSchedule/static/js/2.18bebd08.chunk.js",
     "static/js/2.18bebd08.chunk.js.map": "/MaSchedule/static/js/2.18bebd08.chunk.js.map",
     "index.html": "/MaSchedule/index.html",
-    "precache-manifest.2a10af51aace8576c73ccabcaa9b3f52.js": "/MaSchedule/precache-manifest.2a10af51aace8576c73ccabcaa9b3f52.js",
+    "precache-manifest.0a9887c8fe9ff4264fc6c7495c493242.js": "/MaSchedule/precache-manifest.0a9887c8fe9ff4264fc6c7495c493242.js",
     "service-worker.js": "/MaSchedule/service-worker.js",
     "static/js/2.18bebd08.chunk.js.LICENSE.txt": "/MaSchedule/static/js/2.18bebd08.chunk.js.LICENSE.txt",
     "static/media/thought.jpg": "/MaSchedule/static/media/thought.fa065ac0.jpg"
@@ -15,6 +15,6 @@
   "entrypoints": [
     "static/js/runtime-main.72bd37ec.js",
     "static/js/2.18bebd08.chunk.js",
-    "static/js/main.2ba83473.chunk.js"
+    "static/js/main.d17f997a.chunk.js"
   ]
 }
