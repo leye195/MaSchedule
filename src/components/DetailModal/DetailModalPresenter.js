@@ -60,6 +60,7 @@ const Detail = styled.p`
   width: 100%;
   margin: 5px 5px;
   overflow-y: scroll;
+  white-space: pre;
   display: ${props => (props.edit ? "none" : "block")};
 `;
 const Hidden = styled.input``;

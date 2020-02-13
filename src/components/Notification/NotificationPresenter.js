@@ -48,7 +48,7 @@ class NotificationPresenter extends Component {
           if (upcoming !== undefined) {
             new_notice = upcoming.map(item => {
               return (
-                <Upcoming>
+                <Upcoming key={Date.now() + 50000}>
                   <Time>
                     {tmp.format("MM월DD일")} {item.time}
                   </Time>{" "}
