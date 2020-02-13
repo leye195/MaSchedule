@@ -17,7 +17,19 @@ const Notification = styled.div`
 const Title = styled.p`
   margin: 10px;
 `;
-const UpcomingContainer = styled.ul``;
+const Time = styled.span``;
+const Empty = styled(Title.withComponent("p"))`
+  width: 100%;
+  height: 100%;
+  align-self: center;
+  justify-self: center;
+  text-align: center;
+`;
+const UpcomingContainer = styled.ul`
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+`;
 const Upcoming = styled.li`
   ${styleMixin.noticeliStyle};
 `;
@@ -31,14 +43,30 @@ class NotificationPresenter extends Component {
           } = store;
           const tmp = today.clone().add(1, "days");
           console.log(tmp);
+          const upcoming = toDos[tmp.format("YYYYMMDD")];
+          let new_notice = null;
+          if (upcoming !== undefined) {
+            new_notice = upcoming.map(item => {
+              return (
+                <Upcoming>
+                  <Time>
+                    {tmp.format("MM월DD일")} {item.time}
+                  </Time>{" "}
+                  {item.title}
+                </Upcoming>
+              );
+            });
+          }
           return (
             <Fragment>
               <Notification isOpen={isOpen}>
-                <Title>Upcoming</Title>
+                <Title>내일 일정</Title>
                 <UpcomingContainer>
-                  <Upcoming></Upcoming>
-                  <Upcoming>2</Upcoming>
-                  <Upcoming>3</Upcoming>
+                  {upcoming === undefined ? (
+                    <Empty>일정 없음</Empty>
+                  ) : (
+                    new_notice
+                  )}
                 </UpcomingContainer>
               </Notification>
             </Fragment>

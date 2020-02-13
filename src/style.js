@@ -1,4 +1,4 @@
-import styled, { css } from "styled-components";
+import { css } from "styled-components";
 
 const awesomeCard = css`
   box-shadow: 0 4px 5px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
@@ -21,9 +21,10 @@ const shadowBox = css`
   padding: 5px;
 `;
 const noticeliStyle = css`
-  list-style: none;
+  list-style: inside;
   padding: 5px;
   margin: 10px;
+  font-size: 0.8rem;
 `;
 const style = {
   awesomeCard,
