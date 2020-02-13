@@ -79,6 +79,8 @@ const DayContainer = styled.div`
   }
 `;
 const Date = styled.div`
+  display: flex;
+  flex-direction: column;
   cursor: pointer;
   margin: 5px;
   padding: 5px 10px;
@@ -89,6 +91,10 @@ const Date = styled.div`
   &:hover {
     background-color: ${props => props.theme.mainColor};
     color: ${props => props.theme.whiteColor};
+  }
+  &::after {
+    content: "";
+    border: ${props => (props.haveSchedule ? "1px solid black" : "none")};
   }
 `;
 const DateContainer = styled.div`
@@ -112,7 +118,7 @@ const DateContainer = styled.div`
     }
   }
 `;
-const getCalendarData = (moment, today, selected, selectDate) => {
+const getCalendarData = (moment, today, selected, selectDate, toDos) => {
   const startWeek = moment
     .clone()
     .startOf("month")
@@ -144,10 +150,13 @@ const getCalendarData = (moment, today, selected, selectDate) => {
                 ? true
                 : false;
             //console.log(current.format("YYYYMMDD"));
+            const haveSchedule =
+              toDos[current.format("YYYYMMDD")] === undefined ? false : true;
             return (
               <Date
                 key={i}
                 isToday={isToday}
+                haveSchedule={haveSchedule}
                 onClick={() => selectDate(current.format("YYYYMMDD"))}
               >
                 {current.format("D")}
@@ -173,10 +182,10 @@ const CalendarDay = () => (
     <ScheduleConsumer>
       {store => {
         const {
-          state: { moment, today, selected },
+          state: { moment, today, selected, toDos },
           actions: { selectDate }
         } = store;
-        return getCalendarData(moment, today, selected, selectDate);
+        return getCalendarData(moment, today, selected, selectDate, toDos);
       }}
     </ScheduleConsumer>
   </Fragment>
