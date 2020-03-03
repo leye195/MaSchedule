@@ -28,7 +28,7 @@ const ToDo = styled.li`
   position: relative;
   margin: 10px;
   min-width: 30px;
-  width: 700px;
+  width: 80vw;
   cursor: pointer;
   ${styleMixin.awesomeCard};
   ${styleMixin.flexBoxRow};

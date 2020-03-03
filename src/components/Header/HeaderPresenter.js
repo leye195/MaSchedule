@@ -9,7 +9,7 @@ const HeaderContainer = styled.header`
   position: fixed;
   z-index: 9;
   top: 0;
-  width: 100%;
+  width: 100vw;
   height: 50px;
   background-color: ${props => props.theme.headerColor};
   ${styleMixin.flexBoxRow}

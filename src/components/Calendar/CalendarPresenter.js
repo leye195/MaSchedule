@@ -11,7 +11,7 @@ const Container = styled.div`
   bottom: 0;
   margin: 0;
   height: 310px;
-  width: 100%;
+  width: 100vw;
   background-color: ${props => props.theme.whiteColor};
   ${styleMixin.flexBoxColumn};
   ${styleMixin.awesomeCard};
