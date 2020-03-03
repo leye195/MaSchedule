@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "c3df37ae3370e97015d223d69841a22b",
+    "revision": "0f40726434159d83d883fb168e43c6f2",
     "url": "/MaSchedule/index.html"
   },
   {
@@ -12,8 +12,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/MaSchedule/static/js/2.18bebd08.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "b253ac9e4dce9a9eba2b",
-    "url": "/MaSchedule/static/js/main.6b016dd7.chunk.js"
+    "revision": "138a647b60d538d8b284",
+    "url": "/MaSchedule/static/js/main.6e25942e.chunk.js"
   },
   {
     "revision": "b9351343f324d0aeeb55",
