@@ -1,8 +1,9 @@
-import React, { Component, Fragment } from "react";
+import React, { Fragment, useContext, useCallback } from "react";
 import styled from "styled-components";
 import styleMixin from "../../style";
+import { v4 } from "uuid";
 import { openModal } from "../../animation";
-import { ScheduleConsumer } from "../../contexts/ScheduleContext";
+import { ScheduleConsumer, useSchedule } from "../../contexts/ScheduleContext";
 const SCHEDULE = "SCHEDULE";
 const ModalOverLay = styled.div`
   position: fixed;
@@ -81,13 +82,16 @@ const FormContainer = (props) => (
   </Fragment>
 );
 const ModalPresenter = () => {
-  const saveData = (selected, todo, addTodo) => {
+  const { schedule, actions } = useSchedule();
+  const saveData = (selected, todo, loadData) => {
     const local = localStorage.getItem(SCHEDULE);
+    const newId = v4();
+    let obj = {};
     if (local === null) {
-      const obj = JSON.stringify({
+      obj = JSON.stringify({
         [selected.format("YYYYMMDD")]: [
           {
-            id: Date.now(),
+            id: newId,
             title: todo[0],
             time: todo[1],
             detail: todo[2],
@@ -97,7 +101,7 @@ const ModalPresenter = () => {
       });
       localStorage.setItem(SCHEDULE, obj);
     } else {
-      const obj = JSON.parse(local);
+      obj = JSON.parse(local);
       if (obj[selected.format("YYYYMMDD")] !== undefined) {
         localStorage.setItem(
           SCHEDULE,
@@ -106,7 +110,7 @@ const ModalPresenter = () => {
             [selected.format("YYYYMMDD")]: [
               ...obj[selected.format("YYYYMMDD")],
               {
-                id: Date.now(),
+                id: newId,
                 title: todo[0],
                 time: todo[1],
                 detail: todo[2],
@@ -122,7 +126,7 @@ const ModalPresenter = () => {
             ...obj,
             [selected.format("YYYYMMDD")]: [
               {
-                id: Date.now(),
+                id: newId,
                 title: todo[0],
                 time: todo[1],
                 detail: todo[2],
@@ -133,40 +137,40 @@ const ModalPresenter = () => {
         );
       }
     }
-    addTodo(todo, selected.format("YYYYMMDD"));
+    loadData();
   };
-  const handleSubmit = (todo) => {
-    console.log(todo);
-  };
+  const handleSubmit = useCallback(
+    (selected, loadData, modalClose) => (e) => {
+      console.log(selected);
+      e.preventDefault();
+      const { target } = e;
+      const todo = [];
+      for (let i = 0; i < target.elements.length - 1; i++) {
+        todo.push(target.elements[i].value);
+        target.elements[i].value = "";
+      }
+      saveData(selected, todo, loadData);
+      modalClose();
+    },
+    []
+  );
   return (
     <Fragment>
       <ScheduleConsumer>
         {(store) => {
-          const {
-            state: { isMadalOpen, selected },
-            actions: { modalClose, addTodo },
-          } = store;
+          const { isMadalOpen, selected } = schedule;
+          const { modalClose, loadData } = actions;
           //console.log(isMadalOpen);
           return (
             <Fragment>
               <ModalOverLay isOpen={isMadalOpen} />
               <Modal isOpen={isMadalOpen}>
                 <ModalTitle>
-                  새 일정 {selected.format("YYYY년 MM월 DD일")}
+                  새 일정 {selected?.format("YYYY년 MM월 DD일")}
                 </ModalTitle>
                 <ModalContent>
                   <FormContainer
-                    submit={(e) => {
-                      e.preventDefault();
-                      const { target } = e;
-                      const todo = [];
-                      for (let i = 0; i < target.elements.length - 1; i++) {
-                        todo.push(target.elements[i].value);
-                        target.elements[i].value = "";
-                      }
-                      this.saveData(selected, todo, addTodo);
-                      modalClose();
-                    }}
+                    submit={handleSubmit(selected, loadData, modalClose)}
                     cancel={modalClose}
                   />
                 </ModalContent>

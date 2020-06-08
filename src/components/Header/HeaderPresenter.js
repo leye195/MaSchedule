@@ -1,11 +1,10 @@
-import React, { Component, Fragment } from "react";
+import React, { Fragment, useContext, useEffect } from "react";
 import Notification from "../Notification";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
 import styleMixin from "../../style";
-import { Context, ScheduleConsumer } from "../../contexts/ScheduleContext";
-import { useEffect } from "react";
+import { ScheduleConsumer, useSchedule } from "../../contexts/ScheduleContext";
 const HeaderContainer = styled.header`
   position: fixed;
   z-index: 9;
@@ -67,7 +66,7 @@ const Nav = (props) => {
       <ScheduleConsumer>
         {(store) => {
           const {
-            state: { notice, isOpen },
+            schedule: { notice, isOpen },
             actions: { openNotice, closeNotice },
           } = store;
           //console.log(comingSchedule);
@@ -90,12 +89,12 @@ const Nav = (props) => {
 const HeaderPresenter = () => {
   //static contextType = Context;
   //contentType을 이용햐 Context에 저장되있는 전역 객체 접근 , class에서 만 사용 가능한 방법
+  const scheduleContext = useSchedule();
   useEffect(() => {
-    let value = this.context;
     const {
-      state: { toDos, today },
+      schedule: { toDos, today },
       actions: { setNotification },
-    } = value;
+    } = scheduleContext;
     const tmp = today.clone();
     const comingSchedule = toDos[tmp.add(1, "days").format("YYYYMMDD")];
     if (comingSchedule !== undefined) {
@@ -108,7 +107,9 @@ const HeaderPresenter = () => {
         <Logo>MaSchedule</Logo>
         <ScheduleConsumer>
           {(store) => {
-            const { toDos, today } = store.state;
+            const {
+              schedule: { toDos, today },
+            } = store;
             return (
               <Fragment>
                 <Nav toDos={toDos} today={today} />

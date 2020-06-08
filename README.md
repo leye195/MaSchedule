@@ -12,6 +12,13 @@
 - 스케줄 관리 (등록, 수정, 삭제)
 - 다가오는 스케줄 알림
 
+## 소득
+
+- context 이용한 state 관리
+- useContext와 useReducer hook 활용법
+- 함수 컴포넌트 에서 hook 활용 클래스 컴포넌트 대체
+- styled-component 사용 css-in-JS
+
 <div style="display:flex; flex-direction:column; align-items:center; justify-content:center">
 <img width="500" alt="스크린샷 2020-03-03 오후 12 26 41" src="https://user-images.githubusercontent.com/30601503/75740829-18037980-5d4c-11ea-9012-ad5d78070ab7.png">
 </div>

@@ -1,11 +1,11 @@
-import React, { Component, Fragment } from "react";
+import React, { Fragment, useContext } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClock } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
 import styleMixin from "../../style";
 import { openModal } from "../../animation";
-import { ScheduleConsumer } from "../../contexts/ScheduleContext";
-import { DetailConsumer } from "../../contexts/DetailContext";
+import { ScheduleConsumer, useSchedule } from "../../contexts/ScheduleContext";
+import { DetailConsumer, useDetail } from "../../contexts/DetailContext";
 const ModalOverLay = styled.div`
   position: fixed;
   top: 0;
@@ -130,13 +130,12 @@ const ButtonContainer = (props) => {
 
 const Schedule = (props) => {
   const { id, title, time, detail, detailClose, edit, setEdit } = props;
+  const { schedule, actions } = useSchedule();
   return (
     <ScheduleConsumer>
       {(store) => {
-        const {
-          state: { selected },
-          actions: { deleteTodo, editTodo },
-        } = store;
+        const { selected } = schedule;
+        const { deleteTodo, editTodo } = actions;
         return (
           <Fragment>
             <Back onClick={() => handleClose(detailClose, setEdit)}>X</Back>
@@ -166,7 +165,7 @@ const Schedule = (props) => {
             />
             <ButtonContainer
               id={id}
-              date={selected.format("YYYYMMDD")}
+              date={selected?.format("YYYYMMDD")}
               deleteTodo={deleteTodo}
               detailClose={detailClose}
               setEdit={setEdit}
@@ -180,13 +179,12 @@ const Schedule = (props) => {
   );
 };
 const DetailModalPresenter = () => {
+  const { details, actions } = useDetail();
   return (
     <DetailConsumer>
       {(store) => {
-        const {
-          state: { id, title, time, detail, isDetailOpen, edit },
-          actions: { detailClose, setEdit },
-        } = store;
+        const { id, title, time, detail, isDetailOpen, edit } = details;
+        const { detailClose, setEdit } = actions;
         return (
           <Fragment>
             <ModalOverLay isOpen={isDetailOpen} />

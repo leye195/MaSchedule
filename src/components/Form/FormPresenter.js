@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from "react";
+import React, { Fragment } from "react";
 import styled from "styled-components";
 import styleMixin from "../../style";
 import img1 from "../../img/thought.jpg";
@@ -24,21 +24,21 @@ const Card = styled.form`
   ${styleMixin.flexBoxColumn}
 `;
 const FormPresenter = () => {
-  /*handleForm = e => {
+  const handleForm = (e) => {
     e.preventDefault();
     const key = document.getElementById("key");
     const store = this.context;
     const {
-      actions: { search }
+      actions: { search },
     } = store;
     if (key.value !== "") {
       search(key.value);
       key.value = "";
     }
-  };*/
+  };
   return (
     <Fragment>
-      <Card onSubmit={this.handleForm}>
+      <Card onSubmit={handleForm}>
         <Input id="key" placeholder="일정 기록 검색" />
       </Card>
     </Fragment>

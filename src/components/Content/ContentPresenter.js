@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from "react";
+import React, { Fragment } from "react";
 import styled from "styled-components";
 import styleMixin from "../../style";
 import Calender from "../Calendar";
@@ -7,7 +7,7 @@ import DetailModal from "../DetailModal";
 import { fadeIn } from "../../animation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClock } from "@fortawesome/free-solid-svg-icons";
-import { Context, ScheduleConsumer } from "../../contexts/ScheduleContext";
+import { ScheduleConsumer } from "../../contexts/ScheduleContext";
 import { DetailConsumer } from "../../contexts/DetailContext";
 const Container = styled.div`
   position: relative;
@@ -110,35 +110,37 @@ const toDoPresenter = (todo) => {
     </DetailConsumer>
   );
 };
-const ContentPresenter = () => {
-  const handleEdit = () => {};
+const ContentPresenter = ({ schedule, actions }) => {
+  //const handleEdit = () => {};
   return (
     <Fragment>
       <Container>
         <ScheduleConsumer>
           {(store) => {
-            const {
-              state: { selected },
-            } = store;
-            return <Selected>{selected.format("YYYY년 MM월 DD일")}</Selected>;
+            const { selected } = schedule;
+            return <Selected>{selected?.format("YYYY년 MM월 DD일")}</Selected>;
           }}
         </ScheduleConsumer>
         <ToDoContainer>
           <ScheduleConsumer>
             {(store) => {
-              const {
-                state: { toDos, selected },
-              } = store;
+              const { toDos, selected } = schedule;
               console.log(toDos);
-              const schedule = toDos[selected.format("YYYYMMDD")];
-              if (schedule !== undefined) {
-                const sorted = schedule.sort((a, b) => {
+              const sc =
+                toDos &&
+                Object.keys(toDos).filter(
+                  (todo) => todo === selected.format("YYYYMMDD")
+                ).length > 0
+                  ? toDos[selected.format("YYYYMMDD")]
+                  : undefined;
+              if (sc !== undefined) {
+                const sorted = sc.sort((a, b) => {
                   return a.time < b.time ? -1 : a.time > b.time ? 1 : 0;
                 });
                 const toDo = sorted.map((todo) => {
                   return toDoPresenter(todo);
                 });
-                //console.log(toDo);
+                console.log(toDo);
                 return toDo;
               }
             }}

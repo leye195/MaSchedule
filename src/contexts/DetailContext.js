@@ -1,49 +1,56 @@
-import React, { Component, createContext } from "react";
+import React, { createContext, useContext } from "react";
+import { useState } from "react";
 const Context = createContext();
 const { Provider, Consumer: DetailConsumer } = Context;
 
-class DetailProvider extends Component {
-  _detailOpen = () => {
-    this.setState({
-      isDetailOpen: true
-    });
-  };
-  _detailClose = () => {
-    this.setState({
-      isDetailOpen: false
-    });
-  };
-  _setEdit = flag => {
-    this.setState({
-      edit: flag
-    });
-  };
-  state = {
+const DetailProvider = ({ children }) => {
+  const [details, setDetail] = useState({
     id: "",
     title: "",
     time: "",
     detail: "",
     isDetailOpen: false,
-    edit: false
+    edit: false,
+  });
+  const _detailOpen = () => {
+    setDetail({
+      ...details,
+      isDetailOpen: true,
+    });
   };
-  actions = {
-    setInfo: schedule => {
-      this.setState({
+  const _detailClose = () => {
+    setDetail({
+      ...details,
+      isDetailOpen: false,
+    });
+  };
+  const _setEdit = (flag) => {
+    setDetail({
+      ...details,
+      edit: flag,
+    });
+  };
+  const actions = {
+    setInfo: (schedule) => {
+      setDetail({
         id: schedule.id,
         title: schedule.title,
         time: schedule.time,
-        detail: schedule.detail
+        detail: schedule.detail,
+        isDetailOpen: false,
+        edit: false,
       });
     },
-    detailOpen: this._detailOpen,
-    detailClose: this._detailClose,
-    setEdit: this._setEdit
+    detailOpen: _detailOpen,
+    detailClose: _detailClose,
+    setEdit: _setEdit,
   };
-  render() {
-    const { state, actions } = this;
-    const value = { state, actions };
-    return <Provider value={value}>{this.props.children}</Provider>;
-  }
-}
-
-export { DetailProvider, DetailConsumer };
+  //const { state, actions } = this;
+  const value = { details, actions };
+  return <Provider value={value}>{children}</Provider>;
+};
+const useDetail = () => {
+  const { details, actions } = useContext(Context);
+  return { details, actions };
+};
+export { DetailProvider, DetailConsumer, useDetail };

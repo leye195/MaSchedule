@@ -1,9 +1,9 @@
-import React, { Component, Fragment } from "react";
+import React, { Fragment } from "react";
 import styled from "styled-components";
 import styleMixin from "../../style";
 import { fadeIn } from "../../animation";
 import { MdChevronLeft, MdChevronRight } from "react-icons/md";
-import { ScheduleConsumer } from "../../contexts/ScheduleContext";
+import { ScheduleConsumer, useSchedule } from "../../contexts/ScheduleContext";
 
 const Container = styled.div`
   position: fixed;
@@ -119,11 +119,11 @@ const DateContainer = styled.div`
   }
 `;
 const getCalendarData = (moment, today, selected, selectDate, toDos) => {
-  const startWeek = moment.clone().startOf("month").week();
+  const startWeek = moment?.clone()?.startOf("month")?.week();
   const endWeek =
-    moment.clone().endOf("month").week() === 1
+    moment?.clone()?.endOf("month")?.week() === 1
       ? 53
-      : moment.clone().endOf("month").week();
+      : moment?.clone()?.endOf("month")?.week();
   let calendar = [];
   for (let week = startWeek; week <= endWeek; week++) {
     calendar.push(
@@ -132,25 +132,27 @@ const getCalendarData = (moment, today, selected, selectDate, toDos) => {
           .fill(0)
           .map((n, i) => {
             let current = moment
-              .clone()
-              .week(week)
-              .startOf("week")
-              .add(n + i, "day");
+              ?.clone()
+              ?.week(week)
+              ?.startOf("week")
+              ?.add(n + i, "day");
             const isToday =
-              today.format("YYYYMMDD") === current.format("YYYYMMDD")
+              today?.format("YYYYMMDD") === current?.format("YYYYMMDD")
                 ? true
                 : false;
             //console.log(current.format("YYYYMMDD"));
             const haveSchedule =
-              toDos[current.format("YYYYMMDD")] === undefined ? false : true;
+              toDos && toDos[current?.format("YYYYMMDD")] === undefined
+                ? false
+                : true;
             return (
               <Date
                 key={i}
                 isToday={isToday}
                 haveSchedule={haveSchedule}
-                onClick={() => selectDate(current.format("YYYYMMDD"))}
+                onClick={() => selectDate(current?.format("YYYYMMDD"))}
               >
-                {current.format("D")}
+                {current?.format("D")}
               </Date>
             );
           })}
@@ -159,7 +161,7 @@ const getCalendarData = (moment, today, selected, selectDate, toDos) => {
   }
   return calendar;
 };
-const CalendarDay = () => (
+const CalendarDay = (schedule, actions) => (
   <Fragment>
     <DayContainer>
       <Day>SUN</Day>
@@ -172,23 +174,23 @@ const CalendarDay = () => (
     </DayContainer>
     <ScheduleConsumer>
       {(store) => {
-        const {
-          state: { moment, today, selected, toDos },
-          actions: { selectDate },
-        } = store;
+        const { moment, today, selected, toDos } = schedule;
+        const { selectDate } = actions;
         return getCalendarData(moment, today, selected, selectDate, toDos);
       }}
     </ScheduleConsumer>
   </Fragment>
 );
 const CalendarPresenter = () => {
+  const { schedule, actions } = useSchedule();
+  //console.log(actions);
   return (
     <Fragment>
       <Container>
         <CalendarHeader>
           <ScheduleConsumer>
             {(store) => {
-              const { calenderPrev } = store.actions;
+              const { calenderPrev } = actions;
               return (
                 <Button onClick={calenderPrev}>
                   <MdChevronLeft />
@@ -198,20 +200,19 @@ const CalendarPresenter = () => {
           </ScheduleConsumer>
           <ScheduleConsumer>
             {(store) => {
-              const {
-                state: { moment },
-                actions: { calenderNow },
-              } = store;
+              const { moment } = schedule;
+              const { calenderNow } = actions;
+              console.log(schedule);
               return (
                 <Today onClick={calenderNow}>
-                  {moment.format("MMMM YYYY")}
+                  {moment?.format("MMMM YYYY")}
                 </Today>
               );
             }}
           </ScheduleConsumer>
           <ScheduleConsumer>
             {(store) => {
-              const { calenderNext } = store.actions;
+              const { calenderNext } = actions;
               return (
                 <Button onClick={calenderNext}>
                   <MdChevronRight />
@@ -220,9 +221,7 @@ const CalendarPresenter = () => {
             }}
           </ScheduleConsumer>
         </CalendarHeader>
-        <CalendarBody>
-          <CalendarDay />
-        </CalendarBody>
+        <CalendarBody>{CalendarDay(schedule, actions)}</CalendarBody>
       </Container>
     </Fragment>
   );

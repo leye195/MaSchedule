@@ -1,135 +1,126 @@
-import React, { Component, createContext } from "react";
+import React, { createContext, useState, useCallback, useContext } from "react";
 import moment from "moment";
 //import data from "../fakeData";
 const Context = createContext(); // Context 를 만듭니다;
 const { Provider, Consumer: ScheduleConsumer } = Context;
 const SCHEDULE = "SCHEDULE";
 
-class ScheduleProvider extends Component {
-  loadData = () => {
+const ScheduleProvider = ({ children }) => {
+  const [schedule, setSchedule] = useState({
+    toDos: [],
+    today: moment(),
+    moment: moment(),
+    selected: moment(),
+    isMadalOpen: false,
+    notice: 0,
+    isOpen: false,
+  });
+  const loadData = useCallback(() => {
     const local = localStorage.getItem(SCHEDULE);
     if (local !== null) {
-      return JSON.parse(local);
+      setSchedule({ ...schedule, toDos: JSON.parse(local) });
     }
-    return {};
-  };
-  _calenderNow = () => {
-    this.setState({
+  }, [schedule]);
+  const _calenderNow = () => {
+    setSchedule({
+      ...schedule,
       moment: moment(),
     });
   };
-  _calenderNext = () => {
-    this.setState({
-      moment: this.state.moment.add(1, "month"),
+  const _calenderNext = () => {
+    setSchedule({
+      ...schedule,
+      moment: schedule.moment.add(1, "month"),
     });
   };
-  _calenderPrev = () => {
-    this.setState({
-      moment: this.state.moment.subtract(1, "month"),
+  const _calenderPrev = () => {
+    setSchedule({
+      ...schedule,
+      moment: schedule.moment.subtract(1, "month"),
     });
   };
-  _selectDate = (date) => {
-    this.setState({
+  const _selectDate = (date) => {
+    console.log(date);
+    setSchedule({
+      ...schedule,
       selected: moment(`${date}`),
     });
   };
-  _openModal = () => {
-    this.setState({
+  const _openModal = () => {
+    setSchedule({
+      ...schedule,
       isMadalOpen: true,
     });
   };
-  _closeModal = () => {
-    this.setState({
+  const _closeModal = () => {
+    setSchedule({
+      ...schedule,
       isMadalOpen: false,
     });
   };
-  _setSchedule = (data) => {
+  const _setSchedule = (data) => {
     //console.log(data);
-    this.setState({
+    setSchedule({
+      ...schedule,
       toDos: JSON.stringify(data),
     });
-    console.log(this.state.toDos);
-  };
-  _addSchedule = (todo, date) => {
-    if (this.state.toDos[date] !== undefined) {
-      const newState = this.state.toDos[date].concat([
-        {
-          id: moment().format("S"),
-          title: todo[0],
-          time: todo[1],
-          detail: todo[2],
-          done: false,
-        },
-      ]);
-      this.setState({
-        toDos: {
-          ...this.state.toDos,
-          [date]: newState,
-          //newState
-        },
-      });
-    } else {
-      const newState = [
-        {
-          id: moment().format("S"),
-          title: todo[0],
-          time: todo[1],
-          detail: todo[2],
-          done: false,
-        },
-      ];
-      this.setState({
-        toDos: {
-          ...this.state.toDos,
-          [date]: newState,
-        },
-      });
-    }
     //console.log(this.state.toDos);
   };
-  _deleteSchedule = (date, id) => {
-    const newState = this.state.toDos[date].filter((todo) => todo.id !== id);
-    console.log(newState);
-    this.setState({
+  const _addSchedule = () => {
+    const toDos = loadData();
+    setSchedule({
+      ...schedule,
+      toDos,
+    });
+  };
+  const _deleteSchedule = (date, id) => {
+    const newState = schedule.toDos[date].filter((todo) => todo.id !== id);
+    //console.log(newState);
+    setSchedule({
+      ...schedule,
       toDos: {
-        ...this.state.toDos,
+        ...schedule.toDos,
         [date]: newState,
       },
     });
   };
-  _setNotification = (cnt) => {
-    this.setState({
+  const _setNotification = (cnt) => {
+    setSchedule({
+      ...schedule,
       notice: cnt,
     });
   };
-  _openNotice = () => {
-    this.setState({
+  const _openNotice = () => {
+    setSchedule({
+      ...schedule,
       isOpen: true,
       notice: 0,
     });
   };
-  _closeNotice = () => {
-    this.setState({
+  const _closeNotice = () => {
+    setSchedule({
+      ...schedule,
       isOpen: false,
     });
   };
-  _editSchedule = (date, info) => {
+  const _editSchedule = (date, info) => {
     const { id, title, time, detail } = info;
-    const tmp = this.state.toDos[date].filter((item) => item.id !== id);
-    const newOne = this.state.toDos[date].filter((item) => item.id === id);
+    const tmp = schedule.toDos[date].filter((item) => item.id !== id);
+    const newOne = schedule.toDos[date].filter((item) => item.id === id);
     newOne.title = title;
     newOne.time = time;
     newOne.detail = detail;
     //console.log(target);
-    this.setState({
+    setSchedule({
+      ...schedule,
       toDos: {
         ...this.state.toDos,
         [date]: [...tmp, newOne],
       },
     });
   };
-  _search = (keyword) => {
-    const { toDos } = this.state;
+  const _search = (keyword) => {
+    const { toDos } = schedule;
     const result = [];
     Object.keys(toDos).forEach((item) => {
       const cur = toDos[item];
@@ -140,36 +131,28 @@ class ScheduleProvider extends Component {
     //console.log(result);
     //검색 결과 처리 예정
   };
-  state = {
-    toDos: this.loadData(),
-    today: moment(),
-    moment: moment(),
-    selected: moment(),
-    isMadalOpen: false,
-    notice: 0,
-    isOpen: false,
+  const actions = {
+    loadData,
+    calenderNow: _calenderNow,
+    calenderNext: _calenderNext,
+    calenderPrev: _calenderPrev,
+    modalOpen: _openModal,
+    modalClose: _closeModal,
+    setData: _setSchedule,
+    addTodo: _addSchedule,
+    deleteTodo: _deleteSchedule,
+    editTodo: _editSchedule,
+    selectDate: _selectDate,
+    openNotice: _openNotice,
+    closeNotice: _closeNotice,
+    setNotification: _setNotification,
+    search: _search,
   };
-  actions = {
-    calenderNow: this._calenderNow,
-    calenderNext: this._calenderNext,
-    calenderPrev: this._calenderPrev,
-    modalOpen: this._openModal,
-    modalClose: this._closeModal,
-    setData: this._setSchedule,
-    addTodo: this._addSchedule,
-    deleteTodo: this._deleteSchedule,
-    editTodo: this._editSchedule,
-    selectDate: this._selectDate,
-    openNotice: this._openNotice,
-    closeNotice: this._closeNotice,
-    setNotification: this._setNotification,
-    search: this._search,
-  };
-  render() {
-    const { state, actions } = this;
-    const value = { state, actions };
-    return <Provider value={value}>{this.props.children}</Provider>;
-  }
-}
-
-export { Context, ScheduleProvider, ScheduleConsumer };
+  const value = { schedule, actions };
+  return <Provider value={value}>{children}</Provider>;
+};
+const useSchedule = () => {
+  const { schedule, actions } = useContext(Context);
+  return { schedule, actions };
+};
+export { ScheduleProvider, ScheduleConsumer, useSchedule };

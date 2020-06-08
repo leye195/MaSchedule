@@ -1,7 +1,7 @@
-import React, { Component, Fragment } from "react";
+import React, { Fragment } from "react";
 import styled from "styled-components";
 import styleMixin from "../../style";
-import { ScheduleConsumer } from "../../contexts/ScheduleContext";
+import { ScheduleConsumer, useSchedule } from "../../contexts/ScheduleContext";
 const Notification = styled.div`
   min-height: 200px;
   min-width: 200px;
@@ -34,22 +34,27 @@ const Upcoming = styled.li`
   ${styleMixin.noticeliStyle};
 `;
 const NotificationPresenter = () => {
+  const { schedule } = useSchedule();
   return (
     <ScheduleConsumer>
       {(store) => {
-        const {
-          state: { isOpen, toDos, today },
-        } = store;
-        const tmp = today.clone().add(1, "days");
-        console.log(tmp);
-        const upcoming = toDos[tmp.format("YYYYMMDD")];
+        const { isOpen, toDos, today } = schedule;
+        const tmp = today?.clone()?.add(1, "days");
+        //console.log(toDos);
+        const upcoming =
+          toDos &&
+          Object.keys(toDos).filter(
+            (todo) => todo === tmp?.format("YYYYMMDD")
+          ) >= 0
+            ? toDos[tmp?.format("YYYYMMDD")]
+            : undefined;
         let new_notice = null;
         if (upcoming !== undefined) {
           new_notice = upcoming.map((item) => {
             return (
               <Upcoming key={Date.now() + 50000}>
                 <Time>
-                  {tmp.format("MM월DD일")} {item.time}
+                  {tmp?.format("MM월DD일")} {item.time}
                 </Time>{" "}
                 {item.title}
               </Upcoming>
