@@ -13,7 +13,7 @@ const ModalOverLay = styled.div`
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.16);
-  display: ${props => (props.isOpen === true ? "block" : "none")};
+  display: ${(props) => (props.isOpen === true ? "block" : "none")};
   animation: ${openModal} 0.7s ease-out;
 `;
 const Modal = styled.div`
@@ -23,22 +23,22 @@ const Modal = styled.div`
   transform: translate(-50%, -50%);
   min-width: 350px;
   min-height: 450px;
-  background-color: ${props => props.theme.whiteColor};
-  display: ${props => (props.isOpen === true ? "flex" : "none")} !important;
+  background-color: ${(props) => props.theme.whiteColor};
+  display: ${(props) => (props.isOpen === true ? "flex" : "none")} !important;
   ${styleMixin.flexBoxColumn};
   ${styleMixin.awesomeCard};
   animation: ${openModal} 0.5s ease-out;
 `;
 const Title = styled.h3`
   width: 100%;
-  display: ${props => (props.edit ? "none" : "block")};
+  display: ${(props) => (props.edit ? "none" : "block")};
 `;
 const Input = styled.input`
   width: 100%;
   font-size: 1rem;
   margin-top: 20px;
   padding: 5px 0;
-  display: ${props => (props.edit ? "block" : "none")};
+  display: ${(props) => (props.edit ? "block" : "none")};
 `;
 const DetailInput = styled(Input.withComponent("textarea"))`
   resize: none;
@@ -49,7 +49,7 @@ const Time = styled.p`
   width: 100%;
   border-bottom: 1px solid #5858587d;
   font-size: 0.9rem;
-  display: ${props => (props.edit ? "none" : "block")};
+  display: ${(props) => (props.edit ? "none" : "block")};
   svg {
     margin-right: 5px;
     color: #557cb7;
@@ -61,7 +61,7 @@ const Detail = styled.p`
   margin: 5px 5px;
   overflow-y: scroll;
   white-space: pre;
-  display: ${props => (props.edit ? "none" : "block")};
+  display: ${(props) => (props.edit ? "none" : "block")};
 `;
 const Hidden = styled.input``;
 const Button = styled.button`
@@ -81,13 +81,13 @@ const Back = styled.p`
   font-weight: 800;
 `;
 const Edit = styled(Button.withComponent("button"))`
-  background-color: ${props => props.theme.eletronColor};
-  color: ${props => props.theme.whiteColor};
+  background-color: ${(props) => props.theme.eletronColor};
+  color: ${(props) => props.theme.whiteColor};
   margin: 5px;
 `;
 const Delete = styled(Button.withComponent("button"))`
-  background-color: ${props => props.theme.chigong} !important;
-  color: ${props => props.theme.whiteColor};
+  background-color: ${(props) => props.theme.chigong} !important;
+  color: ${(props) => props.theme.whiteColor};
 `;
 const handleDelete = (id, deleteTodo, detailClose, setEdit) => {
   const date = document.getElementById("date").value;
@@ -113,7 +113,7 @@ const handleClose = (detailClose, setEdit) => {
   setEdit(false);
   detailClose();
 };
-const ButtonContainer = props => {
+const ButtonContainer = (props) => {
   const { id, date, deleteTodo, detailClose, setEdit, edit, editTodo } = props;
   return (
     <Fragment>
@@ -128,14 +128,14 @@ const ButtonContainer = props => {
   );
 };
 
-const Schedule = props => {
+const Schedule = (props) => {
   const { id, title, time, detail, detailClose, edit, setEdit } = props;
   return (
     <ScheduleConsumer>
-      {store => {
+      {(store) => {
         const {
           state: { selected },
-          actions: { deleteTodo, editTodo }
+          actions: { deleteTodo, editTodo },
         } = store;
         return (
           <Fragment>
@@ -179,35 +179,33 @@ const Schedule = props => {
     </ScheduleConsumer>
   );
 };
-class DetailModalPresenter extends Component {
-  render() {
-    return (
-      <DetailConsumer>
-        {store => {
-          const {
-            state: { id, title, time, detail, isDetailOpen, edit },
-            actions: { detailClose, setEdit }
-          } = store;
-          return (
-            <Fragment>
-              <ModalOverLay isOpen={isDetailOpen} />
-              <Modal isOpen={isDetailOpen}>
-                <Schedule
-                  id={id}
-                  title={title}
-                  time={time}
-                  detail={detail}
-                  detailClose={detailClose}
-                  edit={edit}
-                  setEdit={setEdit}
-                />
-              </Modal>
-            </Fragment>
-          );
-        }}
-      </DetailConsumer>
-    );
-  }
-}
+const DetailModalPresenter = () => {
+  return (
+    <DetailConsumer>
+      {(store) => {
+        const {
+          state: { id, title, time, detail, isDetailOpen, edit },
+          actions: { detailClose, setEdit },
+        } = store;
+        return (
+          <Fragment>
+            <ModalOverLay isOpen={isDetailOpen} />
+            <Modal isOpen={isDetailOpen}>
+              <Schedule
+                id={id}
+                title={title}
+                time={time}
+                detail={detail}
+                detailClose={detailClose}
+                edit={edit}
+                setEdit={setEdit}
+              />
+            </Modal>
+          </Fragment>
+        );
+      }}
+    </DetailConsumer>
+  );
+};
 
 export default DetailModalPresenter;

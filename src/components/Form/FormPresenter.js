@@ -20,10 +20,10 @@ const Card = styled.form`
   background-size: cover;
   justify-content: center;
   visibility: hidden;
-  background-color: ${props => props.theme.mainColor};
+  background-color: ${(props) => props.theme.mainColor};
   ${styleMixin.flexBoxColumn}
 `;
-class FormPresenter extends Component {
+const FormPresenter = () => {
   /*handleForm = e => {
     e.preventDefault();
     const key = document.getElementById("key");
@@ -36,15 +36,13 @@ class FormPresenter extends Component {
       key.value = "";
     }
   };*/
-  render() {
-    return (
-      <Fragment>
-        <Card onSubmit={this.handleForm}>
-          <Input id="key" placeholder="일정 기록 검색" />
-        </Card>
-      </Fragment>
-    );
-  }
-}
+  return (
+    <Fragment>
+      <Card onSubmit={this.handleForm}>
+        <Input id="key" placeholder="일정 기록 검색" />
+      </Card>
+    </Fragment>
+  );
+};
 
 export default FormPresenter;

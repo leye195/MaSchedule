@@ -1,9 +1,7 @@
-import React, { Component } from "react";
+import React from "react";
 import HeaderPresenter from "./HeaderPresenter";
 
-class HeaderContainer extends Component {
-  render() {
-    return <HeaderPresenter></HeaderPresenter>;
-  }
-}
+const HeaderContainer = () => {
+  return <HeaderPresenter></HeaderPresenter>;
+};
 export default HeaderContainer;

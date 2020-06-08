@@ -12,7 +12,7 @@ const Container = styled.div`
   margin: 0;
   height: 310px;
   width: 100vw;
-  background-color: ${props => props.theme.whiteColor};
+  background-color: ${(props) => props.theme.whiteColor};
   ${styleMixin.flexBoxColumn};
   ${styleMixin.awesomeCard};
 `;
@@ -22,14 +22,14 @@ const CalendarHeader = styled.div`
   width:100%;
 `;
 const Today = styled.span`
-  cursor: ${props => props.theme.pointer};
+  cursor: ${(props) => props.theme.pointer};
   margin: 5px;
   padding: 5px;
   width: 200px;
   font-size: 1.2rem;
   font-weight: 700;
   text-align: center;
-  color: ${props => props.theme.joustBlue};
+  color: ${(props) => props.theme.joustBlue};
   animation: ${fadeIn} 1s ease-out;
   &:hover {
     background-color: #e3e3e3;
@@ -71,10 +71,10 @@ const DayContainer = styled.div`
     margin: 5px;
     font-weight: bold;
     &:first-child {
-      color: ${props => props.theme.chigong};
+      color: ${(props) => props.theme.chigong};
     }
     &:last-child {
-      color: ${props => props.theme.eletronColor};
+      color: ${(props) => props.theme.eletronColor};
     }
   }
 `;
@@ -85,16 +85,16 @@ const Date = styled.div`
   margin: 5px;
   padding: 5px 10px;
   border-radius: 100%;
-  color: ${props => (props.isToday ? props.theme.whiteColor : "black")};
-  background-color: ${props =>
+  color: ${(props) => (props.isToday ? props.theme.whiteColor : "black")};
+  background-color: ${(props) =>
     props.isToday ? props.theme.eletronColor : "whitesmoke"};
   &:hover {
-    background-color: ${props => props.theme.mainColor};
-    color: ${props => props.theme.whiteColor};
+    background-color: ${(props) => props.theme.mainColor};
+    color: ${(props) => props.theme.whiteColor};
   }
   &::after {
     content: "";
-    border: ${props => (props.haveSchedule ? "1px solid black" : "none")};
+    border: ${(props) => (props.haveSchedule ? "1px solid black" : "none")};
   }
 `;
 const DateContainer = styled.div`
@@ -111,28 +111,19 @@ const DateContainer = styled.div`
     text-align: center;
     justify-content: center;
     &:first-child {
-      color: ${props => props.theme.chigong};
+      color: ${(props) => props.theme.chigong};
     }
     &:last-child {
-      color: ${props => props.theme.eletronColor};
+      color: ${(props) => props.theme.eletronColor};
     }
   }
 `;
 const getCalendarData = (moment, today, selected, selectDate, toDos) => {
-  const startWeek = moment
-    .clone()
-    .startOf("month")
-    .week();
+  const startWeek = moment.clone().startOf("month").week();
   const endWeek =
-    moment
-      .clone()
-      .endOf("month")
-      .week() === 1
+    moment.clone().endOf("month").week() === 1
       ? 53
-      : moment
-          .clone()
-          .endOf("month")
-          .week();
+      : moment.clone().endOf("month").week();
   let calendar = [];
   for (let week = startWeek; week <= endWeek; week++) {
     calendar.push(
@@ -180,63 +171,61 @@ const CalendarDay = () => (
       <Day>SAT</Day>
     </DayContainer>
     <ScheduleConsumer>
-      {store => {
+      {(store) => {
         const {
           state: { moment, today, selected, toDos },
-          actions: { selectDate }
+          actions: { selectDate },
         } = store;
         return getCalendarData(moment, today, selected, selectDate, toDos);
       }}
     </ScheduleConsumer>
   </Fragment>
 );
-class CalendarPresenter extends Component {
-  render() {
-    return (
-      <Fragment>
-        <Container>
-          <CalendarHeader>
-            <ScheduleConsumer>
-              {store => {
-                const { calenderPrev } = store.actions;
-                return (
-                  <Button onClick={calenderPrev}>
-                    <MdChevronLeft />
-                  </Button>
-                );
-              }}
-            </ScheduleConsumer>
-            <ScheduleConsumer>
-              {store => {
-                const {
-                  state: { moment },
-                  actions: { calenderNow }
-                } = store;
-                return (
-                  <Today onClick={calenderNow}>
-                    {moment.format("MMMM YYYY")}
-                  </Today>
-                );
-              }}
-            </ScheduleConsumer>
-            <ScheduleConsumer>
-              {store => {
-                const { calenderNext } = store.actions;
-                return (
-                  <Button onClick={calenderNext}>
-                    <MdChevronRight />
-                  </Button>
-                );
-              }}
-            </ScheduleConsumer>
-          </CalendarHeader>
-          <CalendarBody>
-            <CalendarDay />
-          </CalendarBody>
-        </Container>
-      </Fragment>
-    );
-  }
-}
+const CalendarPresenter = () => {
+  return (
+    <Fragment>
+      <Container>
+        <CalendarHeader>
+          <ScheduleConsumer>
+            {(store) => {
+              const { calenderPrev } = store.actions;
+              return (
+                <Button onClick={calenderPrev}>
+                  <MdChevronLeft />
+                </Button>
+              );
+            }}
+          </ScheduleConsumer>
+          <ScheduleConsumer>
+            {(store) => {
+              const {
+                state: { moment },
+                actions: { calenderNow },
+              } = store;
+              return (
+                <Today onClick={calenderNow}>
+                  {moment.format("MMMM YYYY")}
+                </Today>
+              );
+            }}
+          </ScheduleConsumer>
+          <ScheduleConsumer>
+            {(store) => {
+              const { calenderNext } = store.actions;
+              return (
+                <Button onClick={calenderNext}>
+                  <MdChevronRight />
+                </Button>
+              );
+            }}
+          </ScheduleConsumer>
+        </CalendarHeader>
+        <CalendarBody>
+          <CalendarDay />
+        </CalendarBody>
+      </Container>
+    </Fragment>
+  );
+};
 
 export default CalendarPresenter;

@@ -39,14 +39,14 @@ const ToDo = styled.li`
 `;
 
 const Button = styled.button`
-  border-radius: ${props => props.theme.cardRadius};
+  border-radius: ${(props) => props.theme.cardRadius};
   padding: 10px 0px;
   width: 50px;
   height: 50px;
   appearance: none;
   cursor: pointer;
-  color: ${props => props.theme.whiteColor};
-  background-color: ${props =>
+  color: ${(props) => props.theme.whiteColor};
+  background-color: ${(props) =>
     props.danger ? props.theme.dangerColor : props.theme.successColor};
 `;
 const Add = styled(Button.withComponent("button"))`
@@ -88,10 +88,10 @@ const handleDetail = (todo, detailOpen, setInfo) => {
   detailOpen();
   setInfo(todo);
 };
-const toDoPresenter = todo => {
+const toDoPresenter = (todo) => {
   return (
     <DetailConsumer>
-      {store => {
+      {(store) => {
         const { detailOpen, setInfo } = store.actions;
         return (
           <ToDo
@@ -110,54 +110,52 @@ const toDoPresenter = todo => {
     </DetailConsumer>
   );
 };
-class ContentPresenter extends Component {
-  handleEdit = () => {};
-  render() {
-    return (
-      <Fragment>
-        <Container>
+const ContentPresenter = () => {
+  const handleEdit = () => {};
+  return (
+    <Fragment>
+      <Container>
+        <ScheduleConsumer>
+          {(store) => {
+            const {
+              state: { selected },
+            } = store;
+            return <Selected>{selected.format("YYYY년 MM월 DD일")}</Selected>;
+          }}
+        </ScheduleConsumer>
+        <ToDoContainer>
           <ScheduleConsumer>
-            {store => {
+            {(store) => {
               const {
-                state: { selected }
+                state: { toDos, selected },
               } = store;
-              return <Selected>{selected.format("YYYY년 MM월 DD일")}</Selected>;
+              console.log(toDos);
+              const schedule = toDos[selected.format("YYYYMMDD")];
+              if (schedule !== undefined) {
+                const sorted = schedule.sort((a, b) => {
+                  return a.time < b.time ? -1 : a.time > b.time ? 1 : 0;
+                });
+                const toDo = sorted.map((todo) => {
+                  return toDoPresenter(todo);
+                });
+                //console.log(toDo);
+                return toDo;
+              }
             }}
           </ScheduleConsumer>
-          <ToDoContainer>
-            <ScheduleConsumer>
-              {store => {
-                const {
-                  state: { toDos, selected }
-                } = store;
-                console.log(toDos);
-                const schedule = toDos[selected.format("YYYYMMDD")];
-                if (schedule !== undefined) {
-                  const sorted = schedule.sort((a, b) => {
-                    return a.time < b.time ? -1 : a.time > b.time ? 1 : 0;
-                  });
-                  const toDo = sorted.map(todo => {
-                    return toDoPresenter(todo);
-                  });
-                  //console.log(toDo);
-                  return toDo;
-                }
-              }}
-            </ScheduleConsumer>
-          </ToDoContainer>
-          <Calender />
-          <ScheduleConsumer>
-            {store => {
-              const { modalOpen } = store.actions;
-              return <Add onClick={modalOpen}>추가</Add>;
-            }}
-          </ScheduleConsumer>
-        </Container>
-        <Modal />
-        <DetailModal />
-      </Fragment>
-    );
-  }
-}
+        </ToDoContainer>
+        <Calender />
+        <ScheduleConsumer>
+          {(store) => {
+            const { modalOpen } = store.actions;
+            return <Add onClick={modalOpen}>추가</Add>;
+          }}
+        </ScheduleConsumer>
+      </Container>
+      <Modal />
+      <DetailModal />
+    </Fragment>
+  );
+};
 
 export default ContentPresenter;

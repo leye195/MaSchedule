@@ -11,25 +11,25 @@ const ModalOverLay = styled.div`
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.16);
-  display: ${props => (props.isOpen ? "block" : "none")};
+  display: ${(props) => (props.isOpen ? "block" : "none")};
   animation: ${openModal} 0.7s ease-out;
 `;
 const Modal = styled.div`
   position: fixed;
-  display: ${props => (props.isOpen ? "block" : "none")} !important;
+  display: ${(props) => (props.isOpen ? "block" : "none")} !important;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   min-width: 350px;
   min-height: 350px;
-  background-color: ${props => props.theme.whiteColor};
+  background-color: ${(props) => props.theme.whiteColor};
   ${styleMixin.flexBoxColumn};
   ${styleMixin.awesomeCard};
   animation: ${openModal} 0.5s ease-out;
 `;
 const ModalTitle = styled.p`
   text-align: center;
-  width: ${props => props.theme.fullWidth};
+  width: ${(props) => props.theme.fullWidth};
 `;
 const ModalContent = styled.div``;
 const Form = styled.form`
@@ -58,18 +58,18 @@ const Detail = styled(Input.withComponent("textarea"))`
 `;
 const Submit = styled(Input.withComponent("input"))`
   height: 35px;
-  background-color: ${props => props.theme.successColor} !important;
-  color: ${props => props.theme.whiteColor};
+  background-color: ${(props) => props.theme.successColor} !important;
+  color: ${(props) => props.theme.whiteColor};
   ${styleMixin.awesomeCard};
 `;
 const Cancel = styled(Input.withComponent("button"))`
   height: 35px;
   margin: 0px;
-  background-color: ${props => props.theme.chigong} !important;
-  color: ${props => props.theme.whiteColor};
+  background-color: ${(props) => props.theme.chigong} !important;
+  color: ${(props) => props.theme.whiteColor};
   ${styleMixin.awesomeCard};
 `;
-const FormContainer = props => (
+const FormContainer = (props) => (
   <Fragment>
     <Form onSubmit={props.submit}>
       <Title type="text" name="title" placeholder="일정 제목" required />
@@ -80,10 +80,9 @@ const FormContainer = props => (
     <Cancel onClick={props.cancel}>취소</Cancel>
   </Fragment>
 );
-class ModalPresenter extends Component {
-  saveData = (selected, todo, addTodo) => {
+const ModalPresenter = () => {
+  const saveData = (selected, todo, addTodo) => {
     const local = localStorage.getItem(SCHEDULE);
-    console.log(local);
     if (local === null) {
       const obj = JSON.stringify({
         [selected.format("YYYYMMDD")]: [
@@ -92,9 +91,9 @@ class ModalPresenter extends Component {
             title: todo[0],
             time: todo[1],
             detail: todo[2],
-            done: false
-          }
-        ]
+            done: false,
+          },
+        ],
       });
       localStorage.setItem(SCHEDULE, obj);
     } else {
@@ -111,9 +110,9 @@ class ModalPresenter extends Component {
                 title: todo[0],
                 time: todo[1],
                 detail: todo[2],
-                done: false
-              }
-            ]
+                done: false,
+              },
+            ],
           })
         );
       } else {
@@ -127,59 +126,57 @@ class ModalPresenter extends Component {
                 title: todo[0],
                 time: todo[1],
                 detail: todo[2],
-                done: false
-              }
-            ]
+                done: false,
+              },
+            ],
           })
         );
       }
     }
     addTodo(todo, selected.format("YYYYMMDD"));
   };
-  handleSubmit = todo => {
+  const handleSubmit = (todo) => {
     console.log(todo);
   };
-  render() {
-    return (
-      <Fragment>
-        <ScheduleConsumer>
-          {store => {
-            const {
-              state: { isMadalOpen, selected },
-              actions: { modalClose, addTodo }
-            } = store;
-            //console.log(isMadalOpen);
-            return (
-              <Fragment>
-                <ModalOverLay isOpen={isMadalOpen} />
-                <Modal isOpen={isMadalOpen}>
-                  <ModalTitle>
-                    새 일정 {selected.format("YYYY년 MM월 DD일")}
-                  </ModalTitle>
-                  <ModalContent>
-                    <FormContainer
-                      submit={e => {
-                        e.preventDefault();
-                        const { target } = e;
-                        const todo = [];
-                        for (let i = 0; i < target.elements.length - 1; i++) {
-                          todo.push(target.elements[i].value);
-                          target.elements[i].value = "";
-                        }
-                        this.saveData(selected, todo, addTodo);
-                        modalClose();
-                      }}
-                      cancel={modalClose}
-                    />
-                  </ModalContent>
-                </Modal>
-              </Fragment>
-            );
-          }}
-        </ScheduleConsumer>
-      </Fragment>
-    );
-  }
-}
+  return (
+    <Fragment>
+      <ScheduleConsumer>
+        {(store) => {
+          const {
+            state: { isMadalOpen, selected },
+            actions: { modalClose, addTodo },
+          } = store;
+          //console.log(isMadalOpen);
+          return (
+            <Fragment>
+              <ModalOverLay isOpen={isMadalOpen} />
+              <Modal isOpen={isMadalOpen}>
+                <ModalTitle>
+                  새 일정 {selected.format("YYYY년 MM월 DD일")}
+                </ModalTitle>
+                <ModalContent>
+                  <FormContainer
+                    submit={(e) => {
+                      e.preventDefault();
+                      const { target } = e;
+                      const todo = [];
+                      for (let i = 0; i < target.elements.length - 1; i++) {
+                        todo.push(target.elements[i].value);
+                        target.elements[i].value = "";
+                      }
+                      this.saveData(selected, todo, addTodo);
+                      modalClose();
+                    }}
+                    cancel={modalClose}
+                  />
+                </ModalContent>
+              </Modal>
+            </Fragment>
+          );
+        }}
+      </ScheduleConsumer>
+    </Fragment>
+  );
+};
 
 export default ModalPresenter;

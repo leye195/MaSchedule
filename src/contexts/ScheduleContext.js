@@ -15,38 +15,38 @@ class ScheduleProvider extends Component {
   };
   _calenderNow = () => {
     this.setState({
-      moment: moment()
+      moment: moment(),
     });
   };
   _calenderNext = () => {
     this.setState({
-      moment: this.state.moment.add(1, "month")
+      moment: this.state.moment.add(1, "month"),
     });
   };
   _calenderPrev = () => {
     this.setState({
-      moment: this.state.moment.subtract(1, "month")
+      moment: this.state.moment.subtract(1, "month"),
     });
   };
-  _selectDate = date => {
+  _selectDate = (date) => {
     this.setState({
-      selected: moment(`${date}`)
+      selected: moment(`${date}`),
     });
   };
   _openModal = () => {
     this.setState({
-      isMadalOpen: true
+      isMadalOpen: true,
     });
   };
   _closeModal = () => {
     this.setState({
-      isMadalOpen: false
+      isMadalOpen: false,
     });
   };
-  _setSchedule = data => {
-    console.log(data);
+  _setSchedule = (data) => {
+    //console.log(data);
     this.setState({
-      toDos: JSON.stringify(data)
+      toDos: JSON.stringify(data),
     });
     console.log(this.state.toDos);
   };
@@ -58,15 +58,15 @@ class ScheduleProvider extends Component {
           title: todo[0],
           time: todo[1],
           detail: todo[2],
-          done: false
-        }
+          done: false,
+        },
       ]);
       this.setState({
         toDos: {
           ...this.state.toDos,
-          [date]: newState
+          [date]: newState,
           //newState
-        }
+        },
       });
     } else {
       const newState = [
@@ -75,48 +75,48 @@ class ScheduleProvider extends Component {
           title: todo[0],
           time: todo[1],
           detail: todo[2],
-          done: false
-        }
+          done: false,
+        },
       ];
       this.setState({
         toDos: {
           ...this.state.toDos,
-          [date]: newState
-        }
+          [date]: newState,
+        },
       });
     }
-    console.log(this.state.toDos);
+    //console.log(this.state.toDos);
   };
   _deleteSchedule = (date, id) => {
-    const newState = this.state.toDos[date].filter(todo => todo.id !== id);
+    const newState = this.state.toDos[date].filter((todo) => todo.id !== id);
     console.log(newState);
     this.setState({
       toDos: {
         ...this.state.toDos,
-        [date]: newState
-      }
+        [date]: newState,
+      },
     });
   };
-  _setNotification = cnt => {
+  _setNotification = (cnt) => {
     this.setState({
-      notice: cnt
+      notice: cnt,
     });
   };
   _openNotice = () => {
     this.setState({
       isOpen: true,
-      notice: 0
+      notice: 0,
     });
   };
   _closeNotice = () => {
     this.setState({
-      isOpen: false
+      isOpen: false,
     });
   };
   _editSchedule = (date, info) => {
     const { id, title, time, detail } = info;
-    const tmp = this.state.toDos[date].filter(item => item.id !== id);
-    const newOne = this.state.toDos[date].filter(item => item.id === id);
+    const tmp = this.state.toDos[date].filter((item) => item.id !== id);
+    const newOne = this.state.toDos[date].filter((item) => item.id === id);
     newOne.title = title;
     newOne.time = time;
     newOne.detail = detail;
@@ -124,20 +124,20 @@ class ScheduleProvider extends Component {
     this.setState({
       toDos: {
         ...this.state.toDos,
-        [date]: [...tmp, newOne]
-      }
+        [date]: [...tmp, newOne],
+      },
     });
   };
-  _search = keyword => {
+  _search = (keyword) => {
     const { toDos } = this.state;
     const result = [];
-    Object.keys(toDos).forEach(item => {
+    Object.keys(toDos).forEach((item) => {
       const cur = toDos[item];
       for (let i = 0; i < cur.length; i++) {
         if (cur[i].title.includes(keyword)) result.push(cur[i]);
       }
     });
-    console.log(result);
+    //console.log(result);
     //검색 결과 처리 예정
   };
   state = {
@@ -147,7 +147,7 @@ class ScheduleProvider extends Component {
     selected: moment(),
     isMadalOpen: false,
     notice: 0,
-    isOpen: false
+    isOpen: false,
   };
   actions = {
     calenderNow: this._calenderNow,
@@ -163,7 +163,7 @@ class ScheduleProvider extends Component {
     openNotice: this._openNotice,
     closeNotice: this._closeNotice,
     setNotification: this._setNotification,
-    search: this._search
+    search: this._search,
   };
   render() {
     const { state, actions } = this;

@@ -1,9 +1,7 @@
-import React, { Component } from "react";
+import React from "react";
 import FormPresenter from "./FormPresenter";
-class FormContainer extends Component {
-  render() {
-    return <FormPresenter></FormPresenter>;
-  }
-}
+const FormContainer = () => {
+  return <FormPresenter></FormPresenter>;
+};
 
 export default FormContainer;

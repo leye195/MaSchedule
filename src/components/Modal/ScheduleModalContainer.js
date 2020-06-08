@@ -1,9 +1,7 @@
-import React, { Component } from "react";
+import React from "react";
 import ScheduleModalPresenter from "./ScheduleModalPresenter";
-class ScheduleModalContainer extends Component {
-  render() {
-    return <ScheduleModalPresenter />;
-  }
-}
+const ScheduleModalContainer = () => {
+  return <ScheduleModalPresenter />;
+};
 
 export default ScheduleModalContainer;
