@@ -4,8 +4,6 @@ import styleMixin from "../../style";
 import { fadeIn } from "../../animation";
 import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 import {
-  ScheduleConsumer,
-  useSchedule,
   CALENDER_PREV,
   CALENDER_NEXT,
   CALENDER_NOW,
@@ -86,22 +84,40 @@ const DayContainer = styled.div`
   }
 `;
 const Date = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
   cursor: pointer;
   margin: 5px;
   padding: 5px 10px;
   border-radius: 100%;
-  color: ${(props) => (props.isToday ? props.theme.whiteColor : "black")};
+  color: ${(props) =>
+    props.isToday
+      ? props.theme.whiteColor
+      : props.isSelected
+      ? "white"
+      : ""} !important;
   background-color: ${(props) =>
-    props.isToday ? props.theme.eletronColor : "whitesmoke"};
+    props.isToday
+      ? props.theme.eletronColor
+      : props.isSelected
+      ? "#636e72"
+      : "whitesmoke"};
   &:hover {
     background-color: ${(props) => props.theme.mainColor};
     color: ${(props) => props.theme.whiteColor};
   }
   &::after {
     content: "";
-    border: ${(props) => (props.haveSchedule ? "1px solid black" : "none")};
+    border: ${(props) =>
+      props.haveSchedule
+        ? props.isSelected
+          ? "2px solid white"
+          : "2px solid black"
+        : "none"};
+    position: absolute;
+    bottom: 2px;
+    border-radius: 50%;
   }
 `;
 const DateContainer = styled.div`
@@ -125,9 +141,7 @@ const DateContainer = styled.div`
     }
   }
 `;
-const CalendarPresenter = () => {
-  const { state: schedule, dispatch } = useSchedule();
-  //console.log(actions);
+const CalendarPresenter = ({ schedule, dispatch }) => {
   const CalendarDay = (schedule) => (
     <Fragment>
       <DayContainer>
@@ -154,6 +168,7 @@ const CalendarPresenter = () => {
         ? 53
         : moment?.clone()?.endOf("month")?.week();
     let calendar = [];
+    //console.log(selected);
     for (let week = startWeek; week <= endWeek; week++) {
       calendar.push(
         <DateContainer key={week}>
@@ -171,7 +186,8 @@ const CalendarPresenter = () => {
                   : false;
               //console.log(current.format("YYYYMMDD"));
               const haveSchedule =
-                toDos && toDos[current?.format("YYYYMMDD")] === undefined
+                (toDos && toDos[current?.format("YYYYMMDD")] === undefined) ||
+                toDos[current?.format("YYYYMMDD")].length === 0
                   ? false
                   : true;
               return (
@@ -179,6 +195,9 @@ const CalendarPresenter = () => {
                   key={i}
                   isToday={isToday}
                   haveSchedule={haveSchedule}
+                  isSelected={
+                    current.format("YYYYMMDD") === selected.format("YYYYMMDD")
+                  }
                   onClick={() =>
                     dispatch({
                       type: SELECT_DATE,

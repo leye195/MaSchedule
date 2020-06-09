@@ -4,18 +4,8 @@ import { faClock } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
 import styleMixin from "../../style";
 import { openModal } from "../../animation";
-import {
-  ScheduleConsumer,
-  useSchedule,
-  EDIT_SCHEDULE,
-  DELETE_SCHEDULE,
-} from "../../contexts/ScheduleContext";
-import {
-  DetailConsumer,
-  useDetail,
-  SET_EDIT,
-  DETAIL_CLOSE,
-} from "../../contexts/DetailContext";
+import { EDIT_SCHEDULE, DELETE_SCHEDULE } from "../../contexts/ScheduleContext";
+import { SET_EDIT, DETAIL_CLOSE } from "../../contexts/DetailContext";
 const ModalOverLay = styled.div`
   position: fixed;
   top: 0;
@@ -99,9 +89,12 @@ const Delete = styled(Button.withComponent("button"))`
   background-color: ${(props) => props.theme.chigong} !important;
   color: ${(props) => props.theme.whiteColor};
 `;
-const DetailModalPresenter = () => {
-  const { state: details, dispatch: detailDispatch } = useDetail();
-  const { state: schedule, dispatch: scheduleDispatch } = useSchedule();
+const DetailModalPresenter = ({
+  details,
+  schedule,
+  detailDispatch,
+  scheduleDispatch,
+}) => {
   const Schedule = (props) => {
     const { id, title, time, detail, edit, selected } = props;
     return (

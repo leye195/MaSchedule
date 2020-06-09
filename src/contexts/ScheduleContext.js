@@ -1,10 +1,4 @@
-import React, {
-  createContext,
-  useState,
-  useCallback,
-  useContext,
-  useReducer,
-} from "react";
+import React, { createContext, useContext, useReducer } from "react";
 import moment from "moment";
 //import data from "../fakeData";
 const Context = createContext(); // Context 를 만듭니다;
@@ -23,6 +17,8 @@ export const EDIT_SCHEDULE = "EDIT_SCHEDULE";
 export const SET_NOTIFICATION = "SET_NOTIFICATION";
 export const OPEN_NOTICE = "OPEN_NOTICE";
 export const CLOSE_NOTICE = "CLOSE_NOTICE";
+export const SET_NOTICE = "SET_NOTICE";
+
 const loadData = () => {
   const local = localStorage.getItem(SCHEDULE);
   if (local !== null) {
@@ -44,6 +40,7 @@ const initState = {
 };
 function reducer(state, action) {
   switch (action.type) {
+    //내일 일정
     case "CALENDER_NOW":
       return {
         ...state,

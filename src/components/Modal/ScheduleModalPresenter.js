@@ -4,9 +4,9 @@ import styleMixin from "../../style";
 import { v4 } from "uuid";
 import { openModal } from "../../animation";
 import {
-  useSchedule,
   ADD_SCHEDULE,
   CLOSE_MODAL,
+  useSchedule,
 } from "../../contexts/ScheduleContext";
 const SCHEDULE = "SCHEDULE";
 const ModalOverLay = styled.div`
@@ -75,6 +75,7 @@ const Cancel = styled(Input.withComponent("button"))`
 `;
 const ModalPresenter = () => {
   const { state, dispatch } = useSchedule();
+  //console.log(state);
   const FormContainer = (props) => (
     <Fragment>
       <Form onSubmit={props.submit}>
@@ -171,7 +172,7 @@ const ModalPresenter = () => {
     },
     [dispatch, saveData]
   );
-  console.log(state.isMadalOpen);
+  //console.log(state.isMadalOpen);
   return (
     <Fragment>
       <ModalOverLay isOpen={state.isMadalOpen} />

@@ -22,8 +22,7 @@ const shadowBox = css`
 `;
 const noticeliStyle = css`
   list-style: inside;
-  padding: 5px;
-  margin: 10px;
+  margin-left: 5px;
   font-size: 0.8rem;
 `;
 const style = {
@@ -31,6 +30,6 @@ const style = {
   flexBoxColumn,
   flexBoxRow,
   shadowBox,
-  noticeliStyle
+  noticeliStyle,
 };
 export default style;

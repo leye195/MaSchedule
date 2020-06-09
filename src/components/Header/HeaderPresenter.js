@@ -1,15 +1,10 @@
-import React, { Fragment, useContext, useEffect } from "react";
+import React, { Fragment } from "react";
 import Notification from "../Notification";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
 import styleMixin from "../../style";
-import {
-  useSchedule,
-  SET_NOTIFICATION,
-  CLOSE_NOTICE,
-  OPEN_NOTICE,
-} from "../../contexts/ScheduleContext";
+import { CLOSE_NOTICE, OPEN_NOTICE } from "../../contexts/ScheduleContext";
 const HeaderContainer = styled.header`
   position: fixed;
   z-index: 9;
@@ -55,7 +50,6 @@ const Menu = styled.li`
 const Counter = styled.div`
   position: absolute;
   right: 0;
-  top: 20px;
   border-radius: 50%;
   background-color: white;
   justify-content: center;
@@ -65,50 +59,33 @@ const Counter = styled.div`
   ${styleMixin.flexBoxRow}
   ${styleMixin.shadowBox}
 `;
-const Nav = (props) => {
-  const { notice, isOpen, dispatch } = props;
-  return (
-    <MeunContainer>
-      <Menu
-        onClick={() => {
-          isOpen
-            ? dispatch({ type: CLOSE_NOTICE })
-            : dispatch({ type: OPEN_NOTICE });
-        }}
-      >
-        <FontAwesomeIcon icon={faBell} size="2x" />
-        <Counter>{notice}</Counter>
-        <Notification />
-      </Menu>
-    </MeunContainer>
-  );
-};
-const HeaderPresenter = () => {
+const HeaderPresenter = ({ state, dispatch }) => {
   //static contextType = Context;
   //contentType을 이용햐 Context에 저장되있는 전역 객체 접근 , class에서 만 사용 가능한 방법
-  const { dispatch, state } = useSchedule();
-  useEffect(() => {
-    const { toDos, today } = state;
-    const tmp = today.clone();
-    const comingSchedule = toDos[tmp.add(1, "days").format("YYYYMMDD")];
-    if (comingSchedule !== undefined) {
-      dispatch({
-        type: SET_NOTIFICATION,
-        payload: { len: comingSchedule.length },
-      });
-    }
-  }, [dispatch]);
+  const Nav = () => {
+    const { notice, isOpen } = state;
+    //console.log(notice, isOpen);
+    return (
+      <MeunContainer>
+        <Menu
+          onClick={() => {
+            isOpen
+              ? dispatch({ type: CLOSE_NOTICE })
+              : dispatch({ type: OPEN_NOTICE });
+          }}
+        >
+          <FontAwesomeIcon icon={faBell} size="2x" />
+          <Counter>{notice || 0}</Counter>
+          <Notification />
+        </Menu>
+      </MeunContainer>
+    );
+  };
   return (
     <Fragment>
       <HeaderContainer>
         <Logo>MaSchedule</Logo>
-        <Nav
-          toDos={state.toDos}
-          today={state.today}
-          notice={state.notice}
-          isOpen={state.isOpen}
-          dispatch={dispatch}
-        />
+        <Nav notice={state.notice} isOpen={state.isOpen} />
       </HeaderContainer>
     </Fragment>
   );

@@ -85,9 +85,7 @@ const Selected = styled.div`
 `;
 
 const ContentPresenter = ({ schedule, scheduleDispatch, detailDispatch }) => {
-  //const handleEdit = () => {};
   const { toDos, selected } = schedule;
-  //const { detailOpen, setInfo } = detailDispatch;
   const handleDetail = useCallback(
     (todo) => (e) => {
       detailDispatch({ type: DETAIL_OPEN });

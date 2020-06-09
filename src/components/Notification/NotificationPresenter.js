@@ -1,18 +1,17 @@
-import React, { Fragment } from "react";
+import React from "react";
 import styled from "styled-components";
 import styleMixin from "../../style";
-import { ScheduleConsumer, useSchedule } from "../../contexts/ScheduleContext";
 const Notification = styled.div`
   min-height: 200px;
   min-width: 200px;
   background-color: white;
   position: absolute;
-  top: 50px;
   right: 0px;
   ${styleMixin.awesomeCard};
   padding: 0;
   overflow: scroll;
   display: ${(props) => (props.isOpen ? "block" : "none")};
+  transform: translateY(12.5vh);
 `;
 const Title = styled.p`
   margin: 10px;
@@ -32,46 +31,34 @@ const UpcomingContainer = styled.ul`
 `;
 const Upcoming = styled.li`
   ${styleMixin.noticeliStyle};
+  margin-left: 5px;
 `;
-const NotificationPresenter = () => {
-  const { state } = useSchedule();
+const NotificationPresenter = ({ state, dispatch, upcoming, tmp }) => {
+  const { isOpen } = state;
   return (
-    <ScheduleConsumer>
-      {(store) => {
-        const { isOpen, toDos, today } = state;
-        const tmp = today?.clone()?.add(1, "days");
-        const upcoming =
-          toDos &&
-          Object.keys(toDos).filter(
-            (todo) => todo === tmp?.format("YYYYMMDD")
-          ) >= 0
-            ? toDos[tmp?.format("YYYYMMDD")]
-            : undefined;
-        let new_notice = null;
-        if (upcoming !== undefined) {
-          new_notice = upcoming.map((item) => {
-            return (
-              <Upcoming key={Date.now() + 50000}>
-                <Time>
-                  {tmp?.format("MM월DD일")} {item.time}
-                </Time>{" "}
-                {item.title}
-              </Upcoming>
-            );
-          });
-        }
-        return (
-          <Fragment>
-            <Notification isOpen={isOpen}>
-              <Title>내일 일정</Title>
-              <UpcomingContainer>
-                {upcoming === undefined ? <Empty>일정 없음</Empty> : new_notice}
-              </UpcomingContainer>
-            </Notification>
-          </Fragment>
-        );
-      }}
-    </ScheduleConsumer>
+    <>
+      <Notification isOpen={isOpen}>
+        <Title>내일 일정</Title>
+        <UpcomingContainer>
+          {upcoming === undefined ? (
+            <Empty>일정 없음</Empty>
+          ) : (
+            upcoming
+              .sort((x, y) => (x.time > y.time ? 1 : -1))
+              .map((item) => {
+                return (
+                  <Upcoming key={item._id}>
+                    <Time>
+                      {tmp?.format("MM월DD일")} {item.time}
+                    </Time>{" "}
+                    {item.title}
+                  </Upcoming>
+                );
+              })
+          )}
+        </UpcomingContainer>
+      </Notification>
+    </>
   );
 };
 

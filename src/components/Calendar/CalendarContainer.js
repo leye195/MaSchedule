@@ -1,7 +1,9 @@
 import React from "react";
 import CalendarPresenter from "./CalendarPresenter";
+import { useSchedule } from "../../contexts/ScheduleContext";
 const CalendarContainer = () => {
-  return <CalendarPresenter />;
+  const { state: schedule, dispatch } = useSchedule();
+  return <CalendarPresenter schedule={schedule} dispatch={dispatch} />;
 };
 
 export default CalendarContainer;
