@@ -1,20 +1,20 @@
 {
   "files": {
-    "main.js": "/MaSchedule/static/js/main.6e25942e.chunk.js",
-    "main.js.map": "/MaSchedule/static/js/main.6e25942e.chunk.js.map",
+    "main.js": "/MaSchedule/static/js/main.458c3303.chunk.js",
+    "main.js.map": "/MaSchedule/static/js/main.458c3303.chunk.js.map",
     "runtime-main.js": "/MaSchedule/static/js/runtime-main.72bd37ec.js",
     "runtime-main.js.map": "/MaSchedule/static/js/runtime-main.72bd37ec.js.map",
-    "static/js/2.18bebd08.chunk.js": "/MaSchedule/static/js/2.18bebd08.chunk.js",
-    "static/js/2.18bebd08.chunk.js.map": "/MaSchedule/static/js/2.18bebd08.chunk.js.map",
+    "static/js/2.bb72c3d2.chunk.js": "/MaSchedule/static/js/2.bb72c3d2.chunk.js",
+    "static/js/2.bb72c3d2.chunk.js.map": "/MaSchedule/static/js/2.bb72c3d2.chunk.js.map",
     "index.html": "/MaSchedule/index.html",
-    "precache-manifest.029bdea0cc82726f8edd6f1a6866e925.js": "/MaSchedule/precache-manifest.029bdea0cc82726f8edd6f1a6866e925.js",
+    "precache-manifest.cb4374ae2c3191ed8774c32686cd0769.js": "/MaSchedule/precache-manifest.cb4374ae2c3191ed8774c32686cd0769.js",
     "service-worker.js": "/MaSchedule/service-worker.js",
-    "static/js/2.18bebd08.chunk.js.LICENSE.txt": "/MaSchedule/static/js/2.18bebd08.chunk.js.LICENSE.txt",
+    "static/js/2.bb72c3d2.chunk.js.LICENSE.txt": "/MaSchedule/static/js/2.bb72c3d2.chunk.js.LICENSE.txt",
     "static/media/thought.jpg": "/MaSchedule/static/media/thought.fa065ac0.jpg"
   },
   "entrypoints": [
     "static/js/runtime-main.72bd37ec.js",
-    "static/js/2.18bebd08.chunk.js",
-    "static/js/main.6e25942e.chunk.js"
+    "static/js/2.bb72c3d2.chunk.js",
+    "static/js/main.458c3303.chunk.js"
   ]
 }
