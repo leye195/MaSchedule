@@ -34,10 +34,14 @@ const Title = styled.h3`
   display: ${(props) => (props.edit ? "none" : "block")};
 `;
 const Input = styled.input`
+  all: unset;
+  border: 1px solid #e3e3e3;
+  padding: 5px;
   width: 100%;
-  font-size: 1rem;
   margin-top: 20px;
-  padding: 5px 0;
+  border-radius: 10px;
+  width: 95%;
+  font-size: 1rem;
   display: ${(props) => (props.edit ? "block" : "none")};
 `;
 const DetailInput = styled(Input.withComponent("textarea"))`
@@ -65,11 +69,13 @@ const Detail = styled.p`
 `;
 const Hidden = styled.input``;
 const Button = styled.button`
+  all: unset;
   margin: 8px;
   padding: 5px;
-  width: 100%;
-  height: 35px;
+  width: 95%;
+  height: 20px;
   margin: 0px;
+  text-align: center;
   ${styleMixin.awesomeCard};
 `;
 const Back = styled.p`
@@ -84,10 +90,12 @@ const Edit = styled(Button.withComponent("button"))`
   background-color: ${(props) => props.theme.eletronColor};
   color: ${(props) => props.theme.whiteColor};
   margin: 5px;
+  cursor: pointer;
 `;
 const Delete = styled(Button.withComponent("button"))`
   background-color: ${(props) => props.theme.chigong} !important;
   color: ${(props) => props.theme.whiteColor};
+  cursor: pointer;
 `;
 const DetailModalPresenter = ({
   details,
@@ -97,6 +105,7 @@ const DetailModalPresenter = ({
 }) => {
   const Schedule = (props) => {
     const { id, title, time, detail, edit, selected } = props;
+    //console.log(props);
     return (
       <Fragment>
         <Back onClick={() => handleClose()}>X</Back>

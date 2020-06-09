@@ -64,6 +64,7 @@ const Submit = styled(Input.withComponent("input"))`
   height: 35px;
   background-color: ${(props) => props.theme.successColor} !important;
   color: ${(props) => props.theme.whiteColor};
+  cursor: pointer;
   ${styleMixin.awesomeCard};
 `;
 const Cancel = styled(Input.withComponent("button"))`
@@ -71,6 +72,7 @@ const Cancel = styled(Input.withComponent("button"))`
   margin: 0px;
   background-color: ${(props) => props.theme.chigong} !important;
   color: ${(props) => props.theme.whiteColor};
+  cursor: pointer;
   ${styleMixin.awesomeCard};
 `;
 const ModalPresenter = () => {
