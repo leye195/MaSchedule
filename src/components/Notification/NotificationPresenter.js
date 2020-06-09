@@ -34,13 +34,12 @@ const Upcoming = styled.li`
   ${styleMixin.noticeliStyle};
 `;
 const NotificationPresenter = () => {
-  const { schedule } = useSchedule();
+  const { state } = useSchedule();
   return (
     <ScheduleConsumer>
       {(store) => {
-        const { isOpen, toDos, today } = schedule;
+        const { isOpen, toDos, today } = state;
         const tmp = today?.clone()?.add(1, "days");
-        //console.log(toDos);
         const upcoming =
           toDos &&
           Object.keys(toDos).filter(

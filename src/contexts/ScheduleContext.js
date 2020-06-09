@@ -1,158 +1,166 @@
-import React, { createContext, useState, useCallback, useContext } from "react";
+import React, {
+  createContext,
+  useState,
+  useCallback,
+  useContext,
+  useReducer,
+} from "react";
 import moment from "moment";
 //import data from "../fakeData";
 const Context = createContext(); // Context 를 만듭니다;
 const { Provider, Consumer: ScheduleConsumer } = Context;
 const SCHEDULE = "SCHEDULE";
+export const CALENDER_NOW = "CALENDER_NOW";
+export const CALENDER_NEXT = "CALENDER_NEXT";
+export const CALENDER_PREV = "CALENDER_PREV";
+export const OPEN_MODAL = "OPEN_MODAL";
+export const CLOSE_MODAL = "CLOSE_MODAL";
+export const SELECT_DATE = "SELECT_DATE";
+export const SET_SCHEDULE = "SET_SCHEDULE";
+export const ADD_SCHEDULE = "ADD_SCHEDULE";
+export const DELETE_SCHEDULE = "DELETE_SCHEDULE";
+export const EDIT_SCHEDULE = "EDIT_SCHEDULE";
+export const SET_NOTIFICATION = "SET_NOTIFICATION";
+export const OPEN_NOTICE = "OPEN_NOTICE";
+export const CLOSE_NOTICE = "CLOSE_NOTICE";
+const loadData = () => {
+  const local = localStorage.getItem(SCHEDULE);
+  if (local !== null) {
+    return JSON.parse(local);
+  }
+  return {};
+};
+const saveData = (toDos) => {
+  localStorage.setItem(SCHEDULE, JSON.stringify(toDos));
+};
+const initState = {
+  toDos: loadData(),
+  today: moment(),
+  moment: moment(),
+  selected: moment(),
+  isMadalOpen: false,
+  notice: 0,
+  isOpen: false,
+};
+function reducer(state, action) {
+  switch (action.type) {
+    case "CALENDER_NOW":
+      return {
+        ...state,
+        moment: moment(),
+      };
+    case "CALENDER_NEXT":
+      return {
+        ...state,
+        moment: state.moment.add(1, "month"),
+      };
+    case "CALENDER_PREV":
+      return {
+        ...state,
+        moment: state.moment.subtract(1, "month"),
+      };
+    case "OPEN_MODAL":
+      return {
+        ...state,
+        isMadalOpen: true,
+      };
+    case "CLOSE_MODAL":
+      return {
+        ...state,
+        isMadalOpen: false,
+      };
+    case "SELECT_DATE":
+      return {
+        ...state,
+        selected: moment(`${action.payload.date}`),
+      };
+    case "SET_SCHEDULE":
+      return {
+        ...state,
+        toDos: JSON.stringify(action.payload.len),
+      };
+    case "ADD_SCHEDULE":
+      console.log(state.toDos[action.payload.date]);
+      if (state.toDos[action.payload.date] !== undefined) {
+        return {
+          ...state,
+          toDos: {
+            ...state.toDos,
+            [action.payload.date]: [
+              ...state.toDos[action.payload.date],
+              action.payload.toDo,
+            ],
+          },
+        };
+      } else {
+        return {
+          ...state,
+          toDos: {
+            ...state.toDos,
+            [action.payload.date]: [action.payload.toDo],
+          },
+        };
+      }
+    case "DELETE_SCHEDULE":
+      const filteredSchedule = state.toDos[action.payload.date].filter(
+        (todo) => todo.id !== action.payload.id
+      );
+      saveData({ ...state.toDos, [action.payload.date]: filteredSchedule });
+      return {
+        ...state,
+        toDos: { ...state.toDos, [action.payload.date]: filteredSchedule },
+      };
+    case "EDIT_SCHEDULE":
+      const { id, title, time, detail } = action.payload.info;
+      const filtered = state.toDos[action.payload.date].filter(
+        (item) => item.id !== id
+      );
+      const newOne = state.toDos[action.payload.date].filter(
+        (item) => item.id === id
+      );
+      newOne.title = title;
+      newOne.time = time;
+      newOne.detail = detail;
+      saveData({
+        ...state.toDos,
+        [action.payload.date]: [...filtered, newOne],
+      });
+      return {
+        ...state,
+        toDos: {
+          ...state.toDos,
+          [action.payload.date]: [...filtered, newOne],
+        },
+      };
+    case "SET_NOTIFICATION":
+      return {
+        ...state,
+        notice: action.payload.cnt,
+      };
+    case "OPEN_NOTICE":
+      return {
+        ...state,
+        isOpen: true,
+        notice: 0,
+      };
+    case "CLOSE_NOTICE":
+      return {
+        ...state,
+        isOpen: false,
+      };
+    default:
+      return state;
+  }
+}
 
 const ScheduleProvider = ({ children }) => {
-  const [schedule, setSchedule] = useState({
-    toDos: [],
-    today: moment(),
-    moment: moment(),
-    selected: moment(),
-    isMadalOpen: false,
-    notice: 0,
-    isOpen: false,
-  });
-  const loadData = useCallback(() => {
-    const local = localStorage.getItem(SCHEDULE);
-    if (local !== null) {
-      setSchedule({ ...schedule, toDos: JSON.parse(local) });
-    }
-  }, [schedule]);
-  const _calenderNow = () => {
-    setSchedule({
-      ...schedule,
-      moment: moment(),
-    });
-  };
-  const _calenderNext = () => {
-    setSchedule({
-      ...schedule,
-      moment: schedule.moment.add(1, "month"),
-    });
-  };
-  const _calenderPrev = () => {
-    setSchedule({
-      ...schedule,
-      moment: schedule.moment.subtract(1, "month"),
-    });
-  };
-  const _selectDate = (date) => {
-    console.log(date);
-    setSchedule({
-      ...schedule,
-      selected: moment(`${date}`),
-    });
-  };
-  const _openModal = () => {
-    setSchedule({
-      ...schedule,
-      isMadalOpen: true,
-    });
-  };
-  const _closeModal = () => {
-    setSchedule({
-      ...schedule,
-      isMadalOpen: false,
-    });
-  };
-  const _setSchedule = (data) => {
-    //console.log(data);
-    setSchedule({
-      ...schedule,
-      toDos: JSON.stringify(data),
-    });
-    //console.log(this.state.toDos);
-  };
-  const _addSchedule = () => {
-    const toDos = loadData();
-    setSchedule({
-      ...schedule,
-      toDos,
-    });
-  };
-  const _deleteSchedule = (date, id) => {
-    const newState = schedule.toDos[date].filter((todo) => todo.id !== id);
-    //console.log(newState);
-    setSchedule({
-      ...schedule,
-      toDos: {
-        ...schedule.toDos,
-        [date]: newState,
-      },
-    });
-  };
-  const _setNotification = (cnt) => {
-    setSchedule({
-      ...schedule,
-      notice: cnt,
-    });
-  };
-  const _openNotice = () => {
-    setSchedule({
-      ...schedule,
-      isOpen: true,
-      notice: 0,
-    });
-  };
-  const _closeNotice = () => {
-    setSchedule({
-      ...schedule,
-      isOpen: false,
-    });
-  };
-  const _editSchedule = (date, info) => {
-    const { id, title, time, detail } = info;
-    const tmp = schedule.toDos[date].filter((item) => item.id !== id);
-    const newOne = schedule.toDos[date].filter((item) => item.id === id);
-    newOne.title = title;
-    newOne.time = time;
-    newOne.detail = detail;
-    //console.log(target);
-    setSchedule({
-      ...schedule,
-      toDos: {
-        ...this.state.toDos,
-        [date]: [...tmp, newOne],
-      },
-    });
-  };
-  const _search = (keyword) => {
-    const { toDos } = schedule;
-    const result = [];
-    Object.keys(toDos).forEach((item) => {
-      const cur = toDos[item];
-      for (let i = 0; i < cur.length; i++) {
-        if (cur[i].title.includes(keyword)) result.push(cur[i]);
-      }
-    });
-    //console.log(result);
-    //검색 결과 처리 예정
-  };
-  const actions = {
-    loadData,
-    calenderNow: _calenderNow,
-    calenderNext: _calenderNext,
-    calenderPrev: _calenderPrev,
-    modalOpen: _openModal,
-    modalClose: _closeModal,
-    setData: _setSchedule,
-    addTodo: _addSchedule,
-    deleteTodo: _deleteSchedule,
-    editTodo: _editSchedule,
-    selectDate: _selectDate,
-    openNotice: _openNotice,
-    closeNotice: _closeNotice,
-    setNotification: _setNotification,
-    search: _search,
-  };
-  const value = { schedule, actions };
-  return <Provider value={value}>{children}</Provider>;
+  //const value = { schedule, actions };
+  const [state, dispatch] = useReducer(reducer, initState);
+  //-> put {state,dispath} into value of Provider
+  return <Provider value={{ state, dispatch }}>{children}</Provider>;
 };
 const useSchedule = () => {
-  const { schedule, actions } = useContext(Context);
-  return { schedule, actions };
+  const { state, dispatch } = useContext(Context);
+  return { state, dispatch };
 };
 export { ScheduleProvider, ScheduleConsumer, useSchedule };

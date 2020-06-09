@@ -9,9 +9,9 @@ const theme = {
   eletronColor: "#0984e3",
   joustBlue: "#54a0ff",
   cardRadius: "20px",
-  fullWidth: "100%",
-  fullHeight: "100%",
+  fullWidth: "100vw",
+  fullHeight: "100vh",
   maxHeight: "600px",
-  pointer: "pointer"
+  pointer: "pointer",
 };
 export default theme;

@@ -3,7 +3,14 @@ import styled from "styled-components";
 import styleMixin from "../../style";
 import { fadeIn } from "../../animation";
 import { MdChevronLeft, MdChevronRight } from "react-icons/md";
-import { ScheduleConsumer, useSchedule } from "../../contexts/ScheduleContext";
+import {
+  ScheduleConsumer,
+  useSchedule,
+  CALENDER_PREV,
+  CALENDER_NEXT,
+  CALENDER_NOW,
+  SELECT_DATE,
+} from "../../contexts/ScheduleContext";
 
 const Container = styled.div`
   position: fixed;
@@ -118,110 +125,103 @@ const DateContainer = styled.div`
     }
   }
 `;
-const getCalendarData = (moment, today, selected, selectDate, toDos) => {
-  const startWeek = moment?.clone()?.startOf("month")?.week();
-  const endWeek =
-    moment?.clone()?.endOf("month")?.week() === 1
-      ? 53
-      : moment?.clone()?.endOf("month")?.week();
-  let calendar = [];
-  for (let week = startWeek; week <= endWeek; week++) {
-    calendar.push(
-      <DateContainer key={week}>
-        {Array(7)
-          .fill(0)
-          .map((n, i) => {
-            let current = moment
-              ?.clone()
-              ?.week(week)
-              ?.startOf("week")
-              ?.add(n + i, "day");
-            const isToday =
-              today?.format("YYYYMMDD") === current?.format("YYYYMMDD")
-                ? true
-                : false;
-            //console.log(current.format("YYYYMMDD"));
-            const haveSchedule =
-              toDos && toDos[current?.format("YYYYMMDD")] === undefined
-                ? false
-                : true;
-            return (
-              <Date
-                key={i}
-                isToday={isToday}
-                haveSchedule={haveSchedule}
-                onClick={() => selectDate(current?.format("YYYYMMDD"))}
-              >
-                {current?.format("D")}
-              </Date>
-            );
-          })}
-      </DateContainer>
-    );
-  }
-  return calendar;
-};
-const CalendarDay = (schedule, actions) => (
-  <Fragment>
-    <DayContainer>
-      <Day>SUN</Day>
-      <Day>MON</Day>
-      <Day>TUS</Day>
-      <Day>WED</Day>
-      <Day>THR</Day>
-      <Day>FRI</Day>
-      <Day>SAT</Day>
-    </DayContainer>
-    <ScheduleConsumer>
-      {(store) => {
-        const { moment, today, selected, toDos } = schedule;
-        const { selectDate } = actions;
-        return getCalendarData(moment, today, selected, selectDate, toDos);
-      }}
-    </ScheduleConsumer>
-  </Fragment>
-);
 const CalendarPresenter = () => {
-  const { schedule, actions } = useSchedule();
+  const { state: schedule, dispatch } = useSchedule();
   //console.log(actions);
+  const CalendarDay = (schedule) => (
+    <Fragment>
+      <DayContainer>
+        <Day>SUN</Day>
+        <Day>MON</Day>
+        <Day>TUS</Day>
+        <Day>WED</Day>
+        <Day>THR</Day>
+        <Day>FRI</Day>
+        <Day>SAT</Day>
+      </DayContainer>
+      {getCalendarData(
+        schedule.moment,
+        schedule.today,
+        schedule.selected,
+        schedule.toDos
+      )}
+    </Fragment>
+  );
+  const getCalendarData = (moment, today, selected, toDos) => {
+    const startWeek = moment?.clone()?.startOf("month")?.week();
+    const endWeek =
+      moment?.clone()?.endOf("month")?.week() === 1
+        ? 53
+        : moment?.clone()?.endOf("month")?.week();
+    let calendar = [];
+    for (let week = startWeek; week <= endWeek; week++) {
+      calendar.push(
+        <DateContainer key={week}>
+          {Array(7)
+            .fill(0)
+            .map((n, i) => {
+              let current = moment
+                ?.clone()
+                ?.week(week)
+                ?.startOf("week")
+                ?.add(n + i, "day");
+              const isToday =
+                today?.format("YYYYMMDD") === current?.format("YYYYMMDD")
+                  ? true
+                  : false;
+              //console.log(current.format("YYYYMMDD"));
+              const haveSchedule =
+                toDos && toDos[current?.format("YYYYMMDD")] === undefined
+                  ? false
+                  : true;
+              return (
+                <Date
+                  key={i}
+                  isToday={isToday}
+                  haveSchedule={haveSchedule}
+                  onClick={() =>
+                    dispatch({
+                      type: SELECT_DATE,
+                      payload: { date: current?.format("YYYYMMDD") },
+                    })
+                  }
+                >
+                  {current?.format("D")}
+                </Date>
+              );
+            })}
+        </DateContainer>
+      );
+    }
+    return calendar;
+  };
   return (
     <Fragment>
       <Container>
         <CalendarHeader>
-          <ScheduleConsumer>
-            {(store) => {
-              const { calenderPrev } = actions;
-              return (
-                <Button onClick={calenderPrev}>
-                  <MdChevronLeft />
-                </Button>
-              );
+          <Button
+            onClick={() => {
+              dispatch({ type: CALENDER_PREV });
             }}
-          </ScheduleConsumer>
-          <ScheduleConsumer>
-            {(store) => {
-              const { moment } = schedule;
-              const { calenderNow } = actions;
-              console.log(schedule);
-              return (
-                <Today onClick={calenderNow}>
-                  {moment?.format("MMMM YYYY")}
-                </Today>
-              );
+          >
+            <MdChevronLeft />
+          </Button>
+          <Today
+            onClick={() => {
+              dispatch({ type: CALENDER_NOW });
             }}
-          </ScheduleConsumer>
-          <ScheduleConsumer>
-            {(store) => {
-              const { calenderNext } = actions;
-              return (
-                <Button onClick={calenderNext}>
-                  <MdChevronRight />
-                </Button>
-              );
+          >
+            {schedule.moment?.format("MMMM YYYY")}
+          </Today>
+          <Button
+            onClick={() => {
+              dispatch({ type: CALENDER_NEXT });
             }}
-          </ScheduleConsumer>
+          >
+            <MdChevronRight />
+          </Button>
         </CalendarHeader>
-        <CalendarBody>{CalendarDay(schedule, actions)}</CalendarBody>
+        <CalendarBody>{CalendarDay(schedule)}</CalendarBody>
       </Container>
     </Fragment>
   );

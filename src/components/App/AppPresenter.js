@@ -1,15 +1,14 @@
 import React, { Fragment } from "react";
+import styled, { createGlobalStyle, ThemeProvider } from "styled-components";
+import theme from "../../theme";
 import Header from "../Header";
 import Form from "../Form";
 import Content from "../Content";
-import styled, { createGlobalStyle, ThemeProvider } from "styled-components";
-import theme from "../../theme";
 const GlobalStyle = createGlobalStyle`
   body{
     margin:0;
     padding:0;
   }
-  
   ul,li{
     list-style:none;
     padding:0px;

@@ -1,14 +1,19 @@
-import React, { useEffect } from "react";
+import React from "react";
 import ContentPresenter from "./ContentPresenter";
 import { useSchedule } from "../../contexts/ScheduleContext";
+import { useDetail } from "../../contexts/DetailContext";
 
 const ContentContainer = () => {
-  const { schedule, actions } = useSchedule();
-  useEffect(() => {
-    const { loadData } = actions;
-    loadData();
-  }, []);
-  return <ContentPresenter schedule={schedule} />;
+  const { state, dispatch: scheduleDispatch } = useSchedule();
+  const { dispatch: detailDispatch } = useDetail();
+  //console.log(schedule.toDos);
+  return (
+    <ContentPresenter
+      schedule={state}
+      scheduleDispatch={scheduleDispatch}
+      detailDispatch={detailDispatch}
+    />
+  );
 };
 
 export default ContentContainer;

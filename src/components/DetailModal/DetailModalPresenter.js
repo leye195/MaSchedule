@@ -1,11 +1,21 @@
-import React, { Fragment, useContext } from "react";
+import React, { Fragment } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClock } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
 import styleMixin from "../../style";
 import { openModal } from "../../animation";
-import { ScheduleConsumer, useSchedule } from "../../contexts/ScheduleContext";
-import { DetailConsumer, useDetail } from "../../contexts/DetailContext";
+import {
+  ScheduleConsumer,
+  useSchedule,
+  EDIT_SCHEDULE,
+  DELETE_SCHEDULE,
+} from "../../contexts/ScheduleContext";
+import {
+  DetailConsumer,
+  useDetail,
+  SET_EDIT,
+  DETAIL_CLOSE,
+} from "../../contexts/DetailContext";
 const ModalOverLay = styled.div`
   position: fixed;
   top: 0;
@@ -89,120 +99,97 @@ const Delete = styled(Button.withComponent("button"))`
   background-color: ${(props) => props.theme.chigong} !important;
   color: ${(props) => props.theme.whiteColor};
 `;
-const handleDelete = (id, deleteTodo, detailClose, setEdit) => {
-  const date = document.getElementById("date").value;
-  deleteTodo(date, id);
-  setEdit(false);
-  detailClose();
-};
-const handleEdit = (id, edit, setEdit, editTodo) => {
-  if (edit === false) {
-    setEdit(true);
-  } else if (edit === true) {
-    const title = document.getElementById("titleEdit").value,
-      time = document.getElementById("timeEdit").value,
-      detail = document.getElementById("detailEdit").value,
-      date = document.getElementById("date").value;
-    if (title !== "" && time !== "" && detail !== "") {
-      console.log(id, date, title, time, detail);
-      editTodo(date, { id, title, time, detail });
+const DetailModalPresenter = () => {
+  const { state: details, dispatch: detailDispatch } = useDetail();
+  const { state: schedule, dispatch: scheduleDispatch } = useSchedule();
+  const Schedule = (props) => {
+    const { id, title, time, detail, edit, selected } = props;
+    return (
+      <Fragment>
+        <Back onClick={() => handleClose()}>X</Back>
+        <Title id="title" edit={edit}>
+          {title}
+        </Title>
+        <Input
+          id="titleEdit"
+          type="text"
+          defaultValue={title}
+          edit={edit}
+          required
+        />
+        <Time id="time" edit={edit}>
+          <FontAwesomeIcon icon={faClock} size="1x" />
+          {time}
+        </Time>
+        <Input id="timeEdit" type="time" edit={edit} required />
+        <Detail id="detail" edit={edit}>
+          {detail}
+        </Detail>
+        <DetailInput
+          id="detailEdit"
+          defaultValue={detail}
+          edit={edit}
+          required
+        />
+        <ButtonContainer
+          id={id}
+          date={selected?.format("YYYYMMDD")}
+          edit={edit}
+        />
+      </Fragment>
+    );
+  };
+  const handleDelete = (id) => {
+    const date = document.getElementById("date").value;
+    scheduleDispatch({ type: DELETE_SCHEDULE, payload: { date, id } });
+    detailDispatch({ type: SET_EDIT, payload: { flag: false } });
+    detailDispatch({ type: DETAIL_CLOSE });
+  };
+  const handleEdit = (id, edit) => {
+    if (edit === false) {
+      detailDispatch({ type: SET_EDIT, payload: { flag: true } });
+    } else if (edit === true) {
+      const title = document.getElementById("titleEdit").value,
+        time = document.getElementById("timeEdit").value,
+        detail = document.getElementById("detailEdit").value,
+        date = document.getElementById("date").value;
+      if (title !== "" && time !== "" && detail !== "") {
+        scheduleDispatch({
+          type: EDIT_SCHEDULE,
+          payload: { date: date, info: { id, title, time, detail } },
+        });
+      }
     }
-  }
-};
-const handleClose = (detailClose, setEdit) => {
-  setEdit(false);
-  detailClose();
-};
-const ButtonContainer = (props) => {
-  const { id, date, deleteTodo, detailClose, setEdit, edit, editTodo } = props;
+  };
+  const handleClose = () => {
+    detailDispatch({ type: SET_EDIT, payload: { flag: false } });
+    detailDispatch({ type: DETAIL_CLOSE });
+  };
+  const ButtonContainer = (props) => {
+    const { id, date, edit } = props;
+    return (
+      <Fragment>
+        <Hidden id="date" value={date} type="hidden" />
+        <Edit onClick={() => handleEdit(id, edit)}>수정</Edit>
+        <Delete onClick={() => handleDelete(id)}>삭제</Delete>
+      </Fragment>
+    );
+  };
+  //console.log(details.isDetailOpen);
   return (
     <Fragment>
-      <Hidden id="date" value={date} type="hidden" />
-      <Edit onClick={() => handleEdit(id, edit, setEdit, editTodo)}>수정</Edit>
-      <Delete
-        onClick={() => handleDelete(id, deleteTodo, detailClose, setEdit)}
-      >
-        삭제
-      </Delete>
+      <ModalOverLay isOpen={details.isDetailOpen} />
+      <Modal isOpen={details.isDetailOpen}>
+        <Schedule
+          id={details.id}
+          title={details.title}
+          time={details.time}
+          detail={details.detail}
+          edit={details.edit}
+          selected={schedule.selected}
+        />
+      </Modal>
     </Fragment>
-  );
-};
-
-const Schedule = (props) => {
-  const { id, title, time, detail, detailClose, edit, setEdit } = props;
-  const { schedule, actions } = useSchedule();
-  return (
-    <ScheduleConsumer>
-      {(store) => {
-        const { selected } = schedule;
-        const { deleteTodo, editTodo } = actions;
-        return (
-          <Fragment>
-            <Back onClick={() => handleClose(detailClose, setEdit)}>X</Back>
-            <Title id="title" edit={edit}>
-              {title}
-            </Title>
-            <Input
-              id="titleEdit"
-              type="text"
-              defaultValue={title}
-              edit={edit}
-              required
-            />
-            <Time id="time" edit={edit}>
-              <FontAwesomeIcon icon={faClock} size="1x" />
-              {time}
-            </Time>
-            <Input id="timeEdit" type="time" edit={edit} required />
-            <Detail id="detail" edit={edit}>
-              {detail}
-            </Detail>
-            <DetailInput
-              id="detailEdit"
-              defaultValue={detail}
-              edit={edit}
-              required
-            />
-            <ButtonContainer
-              id={id}
-              date={selected?.format("YYYYMMDD")}
-              deleteTodo={deleteTodo}
-              detailClose={detailClose}
-              setEdit={setEdit}
-              edit={edit}
-              editTodo={editTodo}
-            />
-          </Fragment>
-        );
-      }}
-    </ScheduleConsumer>
-  );
-};
-const DetailModalPresenter = () => {
-  const { details, actions } = useDetail();
-  return (
-    <DetailConsumer>
-      {(store) => {
-        const { id, title, time, detail, isDetailOpen, edit } = details;
-        const { detailClose, setEdit } = actions;
-        return (
-          <Fragment>
-            <ModalOverLay isOpen={isDetailOpen} />
-            <Modal isOpen={isDetailOpen}>
-              <Schedule
-                id={id}
-                title={title}
-                time={time}
-                detail={detail}
-                detailClose={detailClose}
-                edit={edit}
-                setEdit={setEdit}
-              />
-            </Modal>
-          </Fragment>
-        );
-      }}
-    </DetailConsumer>
   );
 };
 

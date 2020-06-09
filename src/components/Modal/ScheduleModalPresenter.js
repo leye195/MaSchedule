@@ -1,9 +1,13 @@
-import React, { Fragment, useContext, useCallback } from "react";
+import React, { Fragment, useCallback } from "react";
 import styled from "styled-components";
 import styleMixin from "../../style";
 import { v4 } from "uuid";
 import { openModal } from "../../animation";
-import { ScheduleConsumer, useSchedule } from "../../contexts/ScheduleContext";
+import {
+  useSchedule,
+  ADD_SCHEDULE,
+  CLOSE_MODAL,
+} from "../../contexts/ScheduleContext";
 const SCHEDULE = "SCHEDULE";
 const ModalOverLay = styled.div`
   position: fixed;
@@ -21,8 +25,7 @@ const Modal = styled.div`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  min-width: 350px;
-  min-height: 350px;
+  width: 60vw;
   background-color: ${(props) => props.theme.whiteColor};
   ${styleMixin.flexBoxColumn};
   ${styleMixin.awesomeCard};
@@ -30,7 +33,7 @@ const Modal = styled.div`
 `;
 const ModalTitle = styled.p`
   text-align: center;
-  width: ${(props) => props.theme.fullWidth};
+  width: 100%;
 `;
 const ModalContent = styled.div``;
 const Form = styled.form`
@@ -70,78 +73,92 @@ const Cancel = styled(Input.withComponent("button"))`
   color: ${(props) => props.theme.whiteColor};
   ${styleMixin.awesomeCard};
 `;
-const FormContainer = (props) => (
-  <Fragment>
-    <Form onSubmit={props.submit}>
-      <Title type="text" name="title" placeholder="일정 제목" required />
-      <Time type="time" required />
-      <Detail type="text" name="detail" placeholder="세부 내용" required />
-      <Submit type="submit" />
-    </Form>
-    <Cancel onClick={props.cancel}>취소</Cancel>
-  </Fragment>
-);
 const ModalPresenter = () => {
-  const { schedule, actions } = useSchedule();
-  const saveData = (selected, todo, loadData) => {
-    const local = localStorage.getItem(SCHEDULE);
-    const newId = v4();
-    let obj = {};
-    if (local === null) {
-      obj = JSON.stringify({
-        [selected.format("YYYYMMDD")]: [
-          {
+  const { state, dispatch } = useSchedule();
+  const FormContainer = (props) => (
+    <Fragment>
+      <Form onSubmit={props.submit}>
+        <Title type="text" name="title" placeholder="일정 제목" required />
+        <Time type="time" required />
+        <Detail type="text" name="detail" placeholder="세부 내용" required />
+        <Submit type="submit" />
+      </Form>
+      <Cancel onClick={() => dispatch({ type: CLOSE_MODAL })}>취소</Cancel>
+    </Fragment>
+  );
+  const saveData = useCallback(
+    (selected, todo) => {
+      const local = localStorage.getItem(SCHEDULE);
+      const newId = v4();
+      let obj = {};
+      if (local === null) {
+        obj = JSON.stringify({
+          [selected.format("YYYYMMDD")]: [
+            {
+              id: newId,
+              title: todo[0],
+              time: todo[1],
+              detail: todo[2],
+              done: false,
+            },
+          ],
+        });
+        localStorage.setItem(SCHEDULE, obj);
+      } else {
+        obj = JSON.parse(local);
+        if (obj[selected.format("YYYYMMDD")] !== undefined) {
+          localStorage.setItem(
+            SCHEDULE,
+            JSON.stringify({
+              ...obj,
+              [selected.format("YYYYMMDD")]: [
+                ...obj[selected.format("YYYYMMDD")],
+                {
+                  id: newId,
+                  title: todo[0],
+                  time: todo[1],
+                  detail: todo[2],
+                  done: false,
+                },
+              ],
+            })
+          );
+        } else {
+          localStorage.setItem(
+            SCHEDULE,
+            JSON.stringify({
+              ...obj,
+              [selected.format("YYYYMMDD")]: [
+                {
+                  id: newId,
+                  title: todo[0],
+                  time: todo[1],
+                  detail: todo[2],
+                  done: false,
+                },
+              ],
+            })
+          );
+        }
+      }
+      dispatch({
+        type: ADD_SCHEDULE,
+        payload: {
+          toDo: {
             id: newId,
             title: todo[0],
             time: todo[1],
             detail: todo[2],
             done: false,
           },
-        ],
+          date: selected.format("YYYYMMDD"),
+        },
       });
-      localStorage.setItem(SCHEDULE, obj);
-    } else {
-      obj = JSON.parse(local);
-      if (obj[selected.format("YYYYMMDD")] !== undefined) {
-        localStorage.setItem(
-          SCHEDULE,
-          JSON.stringify({
-            ...obj,
-            [selected.format("YYYYMMDD")]: [
-              ...obj[selected.format("YYYYMMDD")],
-              {
-                id: newId,
-                title: todo[0],
-                time: todo[1],
-                detail: todo[2],
-                done: false,
-              },
-            ],
-          })
-        );
-      } else {
-        localStorage.setItem(
-          SCHEDULE,
-          JSON.stringify({
-            ...obj,
-            [selected.format("YYYYMMDD")]: [
-              {
-                id: newId,
-                title: todo[0],
-                time: todo[1],
-                detail: todo[2],
-                done: false,
-              },
-            ],
-          })
-        );
-      }
-    }
-    loadData();
-  };
+    },
+    [dispatch]
+  );
   const handleSubmit = useCallback(
-    (selected, loadData, modalClose) => (e) => {
-      console.log(selected);
+    (selected) => (e) => {
       e.preventDefault();
       const { target } = e;
       const todo = [];
@@ -149,36 +166,23 @@ const ModalPresenter = () => {
         todo.push(target.elements[i].value);
         target.elements[i].value = "";
       }
-      saveData(selected, todo, loadData);
-      modalClose();
+      saveData(selected, todo);
+      dispatch({ type: CLOSE_MODAL });
     },
-    []
+    [dispatch, saveData]
   );
+  console.log(state.isMadalOpen);
   return (
     <Fragment>
-      <ScheduleConsumer>
-        {(store) => {
-          const { isMadalOpen, selected } = schedule;
-          const { modalClose, loadData } = actions;
-          //console.log(isMadalOpen);
-          return (
-            <Fragment>
-              <ModalOverLay isOpen={isMadalOpen} />
-              <Modal isOpen={isMadalOpen}>
-                <ModalTitle>
-                  새 일정 {selected?.format("YYYY년 MM월 DD일")}
-                </ModalTitle>
-                <ModalContent>
-                  <FormContainer
-                    submit={handleSubmit(selected, loadData, modalClose)}
-                    cancel={modalClose}
-                  />
-                </ModalContent>
-              </Modal>
-            </Fragment>
-          );
-        }}
-      </ScheduleConsumer>
+      <ModalOverLay isOpen={state.isMadalOpen} />
+      <Modal isOpen={state.isMadalOpen}>
+        <ModalTitle>
+          새 일정 {state.selected?.format("YYYY년 MM월 DD일")}
+        </ModalTitle>
+        <ModalContent>
+          <FormContainer submit={handleSubmit(state.selected)} />
+        </ModalContent>
+      </Modal>
     </Fragment>
   );
 };

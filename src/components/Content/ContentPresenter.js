@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useCallback } from "react";
 import styled from "styled-components";
 import styleMixin from "../../style";
 import Calender from "../Calendar";
@@ -7,14 +7,14 @@ import DetailModal from "../DetailModal";
 import { fadeIn } from "../../animation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClock } from "@fortawesome/free-solid-svg-icons";
-import { ScheduleConsumer } from "../../contexts/ScheduleContext";
-import { DetailConsumer } from "../../contexts/DetailContext";
+import { OPEN_MODAL } from "../../contexts/ScheduleContext";
+import { DETAIL_OPEN, SET_DETAIL } from "../../contexts/DetailContext";
 const Container = styled.div`
   position: relative;
   height: 100%;
-  min-height: 400px;
   ${styleMixin.flexBoxColumn};
   justify-content: center;
+  height: 50vh;
 `;
 const ToDoContainer = styled.ul`
   display: flex;
@@ -37,7 +37,6 @@ const ToDo = styled.li`
     background-color: #dfe6e9;
   }
 `;
-
 const Button = styled.button`
   border-radius: ${(props) => props.theme.cardRadius};
   padding: 10px 0px;
@@ -84,75 +83,55 @@ const Selected = styled.div`
   border-radius: 0;
   padding: 10px 5px;
 `;
-const handleDetail = (todo, detailOpen, setInfo) => {
-  detailOpen();
-  setInfo(todo);
-};
-const toDoPresenter = (todo) => {
-  return (
-    <DetailConsumer>
-      {(store) => {
-        const { detailOpen, setInfo } = store.actions;
-        return (
-          <ToDo
-            id={todo.id}
-            key={todo.id}
-            onClick={() => handleDetail(todo, detailOpen, setInfo)}
-          >
-            <Time>
-              <FontAwesomeIcon icon={faClock} size="1x" />
-              {todo.time}
-            </Time>
-            <Text>{todo.title}</Text>
-          </ToDo>
-        );
-      }}
-    </DetailConsumer>
-  );
-};
-const ContentPresenter = ({ schedule, actions }) => {
+
+const ContentPresenter = ({ schedule, scheduleDispatch, detailDispatch }) => {
   //const handleEdit = () => {};
+  const { toDos, selected } = schedule;
+  //const { detailOpen, setInfo } = detailDispatch;
+  const handleDetail = useCallback(
+    (todo) => (e) => {
+      detailDispatch({ type: DETAIL_OPEN });
+      detailDispatch({ type: SET_DETAIL, payload: { schedule: todo } });
+    },
+    []
+  );
+  const toDoPresenter = (props) => {
+    const { todo } = props;
+    return (
+      <ToDo id={todo.id} key={todo.id} onClick={handleDetail(todo)}>
+        <Time>
+          <FontAwesomeIcon icon={faClock} size="1x" />
+          {todo.time}
+        </Time>
+        <Text>{todo.title}</Text>
+      </ToDo>
+    );
+  };
+  const ToDos = () => {
+    const sc =
+      toDos &&
+      Object.keys(toDos).filter((todo) => todo === selected.format("YYYYMMDD"))
+        .length > 0
+        ? toDos[selected.format("YYYYMMDD")]
+        : undefined;
+    //console.log(toDos);
+    if (sc !== undefined) {
+      const sorted = sc.sort((a, b) => {
+        return a.time < b.time ? -1 : a.time > b.time ? 1 : 0;
+      });
+      const toDo = sorted.map((todo) => {
+        return toDoPresenter({ todo });
+      });
+      return toDo;
+    }
+  };
   return (
     <Fragment>
       <Container>
-        <ScheduleConsumer>
-          {(store) => {
-            const { selected } = schedule;
-            return <Selected>{selected?.format("YYYY년 MM월 DD일")}</Selected>;
-          }}
-        </ScheduleConsumer>
-        <ToDoContainer>
-          <ScheduleConsumer>
-            {(store) => {
-              const { toDos, selected } = schedule;
-              console.log(toDos);
-              const sc =
-                toDos &&
-                Object.keys(toDos).filter(
-                  (todo) => todo === selected.format("YYYYMMDD")
-                ).length > 0
-                  ? toDos[selected.format("YYYYMMDD")]
-                  : undefined;
-              if (sc !== undefined) {
-                const sorted = sc.sort((a, b) => {
-                  return a.time < b.time ? -1 : a.time > b.time ? 1 : 0;
-                });
-                const toDo = sorted.map((todo) => {
-                  return toDoPresenter(todo);
-                });
-                console.log(toDo);
-                return toDo;
-              }
-            }}
-          </ScheduleConsumer>
-        </ToDoContainer>
+        <Selected>{schedule.selected?.format("YYYY년 MM월 DD일")}</Selected>
+        <ToDoContainer>{ToDos()}</ToDoContainer>
         <Calender />
-        <ScheduleConsumer>
-          {(store) => {
-            const { modalOpen } = store.actions;
-            return <Add onClick={modalOpen}>추가</Add>;
-          }}
-        </ScheduleConsumer>
+        <Add onClick={() => scheduleDispatch({ type: OPEN_MODAL })}>추가</Add>
       </Container>
       <Modal />
       <DetailModal />

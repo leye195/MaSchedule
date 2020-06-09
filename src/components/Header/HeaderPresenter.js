@@ -4,7 +4,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
 import styleMixin from "../../style";
-import { ScheduleConsumer, useSchedule } from "../../contexts/ScheduleContext";
+import {
+  useSchedule,
+  SET_NOTIFICATION,
+  CLOSE_NOTICE,
+  OPEN_NOTICE,
+} from "../../contexts/ScheduleContext";
 const HeaderContainer = styled.header`
   position: fixed;
   z-index: 9;
@@ -61,62 +66,49 @@ const Counter = styled.div`
   ${styleMixin.shadowBox}
 `;
 const Nav = (props) => {
+  const { notice, isOpen, dispatch } = props;
   return (
     <MeunContainer>
-      <ScheduleConsumer>
-        {(store) => {
-          const {
-            schedule: { notice, isOpen },
-            actions: { openNotice, closeNotice },
-          } = store;
-          //console.log(comingSchedule);
-          return (
-            <Menu
-              onClick={() => {
-                isOpen ? closeNotice() : openNotice();
-              }}
-            >
-              <FontAwesomeIcon icon={faBell} size="2x" />
-              <Counter>{notice}</Counter>
-              <Notification />
-            </Menu>
-          );
+      <Menu
+        onClick={() => {
+          isOpen
+            ? dispatch({ type: CLOSE_NOTICE })
+            : dispatch({ type: OPEN_NOTICE });
         }}
-      </ScheduleConsumer>
+      >
+        <FontAwesomeIcon icon={faBell} size="2x" />
+        <Counter>{notice}</Counter>
+        <Notification />
+      </Menu>
     </MeunContainer>
   );
 };
 const HeaderPresenter = () => {
   //static contextType = Context;
   //contentType을 이용햐 Context에 저장되있는 전역 객체 접근 , class에서 만 사용 가능한 방법
-  const scheduleContext = useSchedule();
+  const { dispatch, state } = useSchedule();
   useEffect(() => {
-    const {
-      schedule: { toDos, today },
-      actions: { setNotification },
-    } = scheduleContext;
+    const { toDos, today } = state;
     const tmp = today.clone();
     const comingSchedule = toDos[tmp.add(1, "days").format("YYYYMMDD")];
     if (comingSchedule !== undefined) {
-      setNotification(comingSchedule.length);
+      dispatch({
+        type: SET_NOTIFICATION,
+        payload: { len: comingSchedule.length },
+      });
     }
-  }, []);
+  }, [dispatch]);
   return (
     <Fragment>
       <HeaderContainer>
         <Logo>MaSchedule</Logo>
-        <ScheduleConsumer>
-          {(store) => {
-            const {
-              schedule: { toDos, today },
-            } = store;
-            return (
-              <Fragment>
-                <Nav toDos={toDos} today={today} />
-              </Fragment>
-            );
-          }}
-        </ScheduleConsumer>
+        <Nav
+          toDos={state.toDos}
+          today={state.today}
+          notice={state.notice}
+          isOpen={state.isOpen}
+          dispatch={dispatch}
+        />
       </HeaderContainer>
     </Fragment>
   );
